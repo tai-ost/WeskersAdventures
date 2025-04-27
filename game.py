@@ -17,10 +17,15 @@ class Game:
         self.__height = height
         self.__screensize = (self.__width, self.__height)
         self.__screen = pygame.display.set_mode(self.__screensize)
+
         self.__fps = fps
         self.__clock = pygame.time.Clock()
+        self.__start_time = self.__time_passed = pygame.time.get_ticks()
+        self.__seven_minutes = False  # ... is all he can spare to play with you ;)
+
         self.__current_scene = start_scene
         self.__previous_scene = start_scene
+
         self.__alpha_level = 0
 
         self.__wesker = Wesker()
@@ -31,12 +36,17 @@ class Game:
 
     def run(self):
         while self.__running:
+            self.__check_time()
             self.__check_events()
             self.__move()
             self.__check_logic()
             self.__draw()
 
             self.__clock.tick(self.__fps)
+
+    def __check_time(self):
+        self.__time_passed = pygame.time.get_ticks() - self.__start_time
+        self.__seven_minutes = self.__time_passed > 420_000
 
     def __check_events(self):
         for event in pygame.event.get():

@@ -55,7 +55,7 @@ class Wesker:
             pygame.K_d: False
         }
 
-        self.__last_direction = False  # Флаг для определения idle состояния по окончании движения
+        self.__last_direction = False  # Флаг для определения idle/aiming состояния по окончании движения
 
         self.__ammo = DEFAULT_AMMO
 
