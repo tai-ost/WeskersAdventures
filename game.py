@@ -2,6 +2,7 @@ import pygame
 
 from constants import WIDTH, HEIGHT, ACTUAL_HEIGHT, FLOOR_HEIGHT
 from wesker import Wesker
+from hud import HUD
 from scenes import Scene, Door
 
 
@@ -23,6 +24,7 @@ class Game:
         self.__alpha_level = 0
 
         self.__wesker = Wesker()
+        self.__hud = HUD(self.__wesker.get_ammo())
 
         self.__font = None
         self.__scenes = None
@@ -50,6 +52,8 @@ class Game:
                 if action_code == 1:
                     self.__change_current_scene(action)
                     self.__alpha_level = 80
+
+        self.__hud.update_ammo(self.__wesker.get_ammo())
 
     def __check_logic(self):
         self.__wesker.check_wesker_logic()

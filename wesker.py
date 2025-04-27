@@ -1,6 +1,6 @@
 import pygame
 
-from constants import WIDTH, HEIGHT, FPS, ACTUAL_HEIGHT, GRAVITY_ACCELERATION
+from constants import WIDTH, FPS, ACTUAL_HEIGHT, GRAVITY_ACCELERATION, DEFAULT_AMMO
 
 
 class Wesker:
@@ -57,7 +57,7 @@ class Wesker:
 
         self.__last_direction = False  # Флаг для определения idle состояния по окончании движения
 
-        self.__ammo = 30
+        self.__ammo = DEFAULT_AMMO
 
         self.__aiming = False
         self.__firing = False
@@ -78,16 +78,22 @@ class Wesker:
             if event.button == 3:  # Проверка на нажатие ПКМ
                 self.__aiming = True
             elif event.button == 1:
-                self.__firing = True
+                if self.__aiming:
+                    self.__firing = True
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 3:
                 self.__aiming = False
+                self.__firing = False
 
-    def shot_fired(self):
-        return self.__have_fired, self.__last_direction
+    def get_ammo(self):
+        return self.__ammo
+
+    # def shot_fired(self):
+    #     return self.__have_fired, self.__last_direction
 
     def check_wesker_logic(self):
         self.__check_wall_collision()
+        self.__check_wesker_state()
 
     def __check_wall_collision(self):
         if self.__rect.x < 0:
@@ -199,5 +205,5 @@ class Wesker:
         return self.__rect
 
     def draw_wesker(self, screen):
-        self.__check_wesker_state()
+        # self.__check_wesker_state()
         screen.blit(self.__load_wesker_image(self.__state), self.__rect)
