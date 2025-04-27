@@ -1,6 +1,6 @@
 import pygame
 
-from constants import WIDTH, FPS, ACTUAL_HEIGHT, GRAVITY_ACCELERATION, DEFAULT_AMMO
+from constants import WIDTH, FPS, ACTUAL_HEIGHT, GRAVITY_ACCELERATION, DEFAULT_AMMO_LOADED
 
 
 class Wesker:
@@ -57,7 +57,7 @@ class Wesker:
 
         self.__last_direction = False  # Флаг для определения idle/aiming состояния по окончании движения
 
-        self.__ammo = DEFAULT_AMMO
+        self.__ammo = DEFAULT_AMMO_LOADED
 
         self.__aiming = False
         self.__firing = False
@@ -87,6 +87,9 @@ class Wesker:
 
     def get_ammo(self):
         return self.__ammo
+
+    def reload(self, new_ammo):
+        self.__ammo += new_ammo
 
     # def shot_fired(self):
     #     return self.__have_fired, self.__last_direction

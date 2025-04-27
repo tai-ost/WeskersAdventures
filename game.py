@@ -1,38 +1,42 @@
 import pygame
 
-from constants import WIDTH, HEIGHT, ACTUAL_HEIGHT, FLOOR_HEIGHT
+from constants import WIDTH, HEIGHT, FPS, ACTUAL_HEIGHT, FLOOR_HEIGHT
 from wesker import Wesker
 from hud import HUD
 from scenes import Scene, Door
 
 
 class Game:
-    def __init__(self, width, height, fps, start_scene=0):
+    def __init__(self, start_scene: int = 0):
         pygame.init()
 
-        pygame.display.set_caption('Wesker\'s Adventures')
-        self.__running = True
-
-        self.__width = width
-        self.__height = height
-        self.__screensize = (self.__width, self.__height)
-        self.__screen = pygame.display.set_mode(self.__screensize)
-
-        self.__fps = fps
-        self.__clock = pygame.time.Clock()
+        self.__start_time: int
+        self.__time_passed: int
         self.__start_time = self.__time_passed = pygame.time.get_ticks()
-        self.__seven_minutes = False  # ... is all he can spare to play with you ;)
 
-        self.__current_scene = start_scene
-        self.__previous_scene = start_scene
+        pygame.display.set_caption('Wesker\'s Adventures')
+        self.__running: bool = True
 
-        self.__alpha_level = 0
+        self.__width: int = WIDTH
+        self.__height: int = HEIGHT
+        self.__screensize: tuple = (self.__width, self.__height)
+        self.__screen: pygame.Surface = pygame.display.set_mode(self.__screensize)
 
-        self.__wesker = Wesker()
-        self.__hud = HUD(self.__wesker.get_ammo())
+        self.__fps: int = FPS
+        self.__clock: pygame.time.Clock = pygame.time.Clock()
+        self.__seven_minutes: bool = False  # ... is all he can spare to play with you ;)
 
-        self.__font = None
-        self.__scenes = None
+        self.__current_scene: int = start_scene
+        self.__previous_scene: int = start_scene
+
+        self.__alpha_level: int = 0
+
+        self.__wesker: Wesker = Wesker()
+
+        self.__hud: HUD
+        self.__font_re: pygame.font.Font
+        self.__font_special: pygame.font.Font
+        self.__scenes: list
 
     def run(self):
         while self.__running:
@@ -49,6 +53,7 @@ class Game:
         self.__seven_minutes = self.__time_passed > 420_000
 
     def __check_events(self):
+        self.__hud.update_ammo(self.__wesker.get_ammo())
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.__running = False
@@ -62,11 +67,15 @@ class Game:
                 if action_code == 1:
                     self.__change_current_scene(action)
                     self.__alpha_level = 80
-
-        self.__hud.update_ammo(self.__wesker.get_ammo())
+                ...
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_h):
+                self.__hud.hide_or_show()
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_r) and (self.__wesker.get_ammo() < 15):
+                self.__wesker.reload(self.__hud.reload())
 
     def __check_logic(self):
         self.__wesker.check_wesker_logic()
+        self.__hud.check_health()
         self.__scenes[self.__current_scene].check_scene_logic(self.__wesker)
 
     def __move(self):
@@ -75,6 +84,7 @@ class Game:
     def __draw(self):
         self.__draw_scene()
         self.__draw_characters()
+        self.__draw_hud()
         self.__draw_darkness()
 
         pygame.display.flip()
@@ -99,48 +109,56 @@ class Game:
     def __draw_characters(self):
         self.__wesker.draw_wesker(self.__screen)
 
+    def __draw_hud(self):
+        self.__hud.draw_hud(self.__screen)
+
     def __change_current_scene(self, next_scene):
         self.__previous_scene = self.__current_scene
         self.__current_scene = next_scene
 
     def prepare_game(self):
         self.__prepare_font()
+        self.__prepare_hud()
         self.__prepare_scenes()
 
     def __prepare_font(self):
-        self.__font = pygame.font.Font('fonts/re_font.ttf', 30)
+        self.__font_re = pygame.font.Font('fonts/re_font.ttf', 30)
+        self.__font_special = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 30)
+
+    def __prepare_hud(self):
+        self.__hud = HUD(self.__font_special)
 
     def __prepare_scenes(self):
         scene_0_entities = [
             Door(WIDTH - 170, ACTUAL_HEIGHT - 270,
                  'door_var_1', 150, 270,
-                 0, 1, self.__font, 1),
+                 0, 1, self.__font_re, 1),
             Door(20, ACTUAL_HEIGHT - 270,
                  'door_var_2', 150, 270,
-                 0, 2, self.__font, 1)
+                 0, 2, self.__font_re, 1)
         ]
 
         scene_1_entities = [
             Door(WIDTH - 170, ACTUAL_HEIGHT - 270,
                  'door_var_1', 150, 270,
-                 1, 0, self.__font, 1),
+                 1, 0, self.__font_re, 1),
             Door(20, ACTUAL_HEIGHT - 270,
                  'door_var_2', 150, 270,
-                 1, 2, self.__font, 1)
+                 1, 2, self.__font_re, 1)
         ]
 
         scene_2_entities = [
             Door(WIDTH - 170, ACTUAL_HEIGHT - 270,
                  'door_var_1', 150, 270,
-                 2, 0, self.__font, 1),
+                 2, 0, self.__font_re, 1),
             Door(20, ACTUAL_HEIGHT - 270,
                  'door_var_2', 150, 270,
-                 2, 1, self.__font, 1)
+                 2, 1, self.__font_re, 1)
         ]
 
-        self.__scenes = [Scene(0, 'scene_1', scene_0_entities, self.__font),
-                         Scene(1, 'scene_2', scene_1_entities, self.__font),
-                         Scene(2, 'scene_3', scene_2_entities, self.__font)]
+        self.__scenes = [Scene(0, 'scene_1', scene_0_entities, self.__font_re),
+                         Scene(1, 'scene_2', scene_1_entities, self.__font_re),
+                         Scene(2, 'scene_3', scene_2_entities, self.__font_re)]
 
     def __del__(self):
         pygame.quit()
