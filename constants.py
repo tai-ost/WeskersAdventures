@@ -8,3 +8,18 @@ INVENTORY_SLOT_WIDTH = INVENTORY_SLOT_HEIGHT = 80
 ITEM_WIDTH = ITEM_HEIGHT = 54
 DEFAULT_AMMO_LOADED = 15
 DEFAULT_AMMO_STORED = 30
+DOOR_TYPES = (
+    'walk through the door',
+    'go up the stairs',
+    'go down the stairs'
+)
+# (name, health, dmg, speed, is_poisonous, width, height)
+ENEMY_TYPES = (
+    ('zombie', 3, 25, 5, False, 100, 200),
+    ('crimson_head', 3, 25, 7, False, 100, 200),
+    ('cerberus', 2, 25, 10, False, 100, 50),
+    ('adder', 1, 1, 10, True, 100, 20),
+    ('hunter', 5, 40, 5, True, 200, 200),
+    ('chimera', 2, 25, 8, False, 100, 200),
+    ('lisa_trevor', 20, 20, 3, False, 150, 200)
+)

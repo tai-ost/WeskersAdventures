@@ -15,7 +15,7 @@ class Wesker:
         self.__y_coord = ACTUAL_HEIGHT - self.__image_height
 
         self.__rect = pygame.Rect(self.__x_coord, self.__y_coord, self.__image_width, self.__image_height)
-        self.__hitbox_rect = pygame.Rect(self.__rect.x, self.__rect.y, self.__hitbox_width, self.__hitbox_height)
+        self.__hitbox_rect = pygame.Rect(self.__rect.x + 50, self.__rect.y, self.__hitbox_width, self.__hitbox_height)
 
         # Кортеж с возможными состояниями и соответствующими им названиями изображений
         self.__possible_states = (
@@ -120,6 +120,7 @@ class Wesker:
         elif self.__rect.y > ACTUAL_HEIGHT - self.__rect.height:
             self.__rect.y = ACTUAL_HEIGHT - self.__rect.height
             self.__y_velocity = 0
+        self.__update_hitbox_rect()
 
     def move(self):
         # Меняем скорость в зависимости от направления ускорения по оси X
@@ -151,7 +152,9 @@ class Wesker:
             self.__y_velocity = -self.__max_y_velocity
 
         # Свободное перемещение по воздуху (смешнявка)
-        # self.__y_velocity += self.__acceleration * (self.__direction[pygame.K_s] - self.__direction[pygame.K_w])
+        # self.__y_velocity += self.__acceleration * (self.__direction[pygame.K_s] -
+        #                                             (self.__direction[pygame.K_w] or
+        #                                              self.__direction[pygame.K_SPACE]))
         # if not (self.__direction[pygame.K_w] or self.__direction[pygame.K_s]):
         #     self.__y_velocity += self.__gravity_acceleration
         # elif self.__y_velocity > self.__max_y_velocity:
@@ -162,6 +165,7 @@ class Wesker:
         # Меняем позицию
         self.__rect.x += self.__x_velocity
         self.__rect.y += self.__y_velocity
+        self.__update_hitbox_rect()
 
     def __load_wesker_image(self, image_path):
         image = pygame.transform.scale(
@@ -173,7 +177,7 @@ class Wesker:
     def __check_wesker_state(self):
         # Перезарядка
         if self.__reloading:
-            self.__x_velocity = 0
+            self.__x_velocity = self.__y_velocity = 0
             reloading_duration = self.__reloading_end_time - self.__reloading_start_time
             self.__state = self.__possible_states[14 + (reloading_duration > 500)]
             self.__reloading_end_time = pygame.time.get_ticks()
@@ -181,7 +185,7 @@ class Wesker:
                 self.__reloading = False
         # Прицеливание / выстрел
         elif self.__aiming and (self.__rect.y >= (ACTUAL_HEIGHT - self.__rect.height)):
-            self.__x_velocity = 0
+            self.__x_velocity = self.__y_velocity = 0
             if self.__firing and (self.__firing_delay == 0) and (self.__ammo > 0):
                 self.__firing_delay = pygame.time.get_ticks() + 500
                 self.__ammo = max(0, self.__ammo - 1)
@@ -223,9 +227,14 @@ class Wesker:
 
     def change_x_position(self, new_x):
         self.__rect.x = new_x
+        self.__update_hitbox_rect()
 
-    def get_rect(self):  # ;)
-        return self.__rect
+    def get_hitbox_rect(self):  # ;)
+        return self.__hitbox_rect
+
+    def __update_hitbox_rect(self):
+        self.__hitbox_rect.x = self.__rect.x + 50
+        self.__hitbox_rect.y = self.__rect.y
 
     def draw_wesker(self, screen):
         # self.__check_wesker_state()

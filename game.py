@@ -137,30 +137,30 @@ class Game:
 
     def __prepare_scenes(self):
         scene_0_entities = [
-            Door(WIDTH - 170, ACTUAL_HEIGHT - 270,
+            Door(WIDTH - 170,
                  'door_var_1', 150, 270,
-                 0, 1, self.__font_re, 1),
-            Door(20, ACTUAL_HEIGHT - 270,
+                 0, 1, self.__font_re, 0),
+            Door(20,
                  'door_var_2', 150, 270,
-                 0, 2, self.__font_re, 1)
+                 0, 2, self.__font_re, 0)
         ]
 
         scene_1_entities = [
-            Door(WIDTH - 170, ACTUAL_HEIGHT - 270,
+            Door(WIDTH - 170,
                  'door_var_1', 150, 270,
                  1, 0, self.__font_re, 1),
-            Door(20, ACTUAL_HEIGHT - 270,
+            Door(20,
                  'door_var_2', 150, 270,
                  1, 2, self.__font_re, 1)
         ]
 
         scene_2_entities = [
-            Door(WIDTH - 170, ACTUAL_HEIGHT - 270,
+            Door(WIDTH - 170,
                  'door_var_1', 150, 270,
-                 2, 0, self.__font_re, 1),
-            Door(20, ACTUAL_HEIGHT - 270,
+                 2, 0, self.__font_re, 2),
+            Door(20,
                  'door_var_2', 150, 270,
-                 2, 1, self.__font_re, 1)
+                 2, 1, self.__font_re, 2)
         ]
 
         self.__scenes = [Scene(0, 'scene_1', scene_0_entities, self.__font_re),

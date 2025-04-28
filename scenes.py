@@ -1,7 +1,7 @@
 import pygame
 
 
-from constants import WIDTH, HEIGHT, ACTUAL_HEIGHT, FLOOR_HEIGHT
+from constants import WIDTH, HEIGHT, ACTUAL_HEIGHT, FLOOR_HEIGHT, DOOR_TYPES, ENEMY_TYPES
 from wesker import Wesker
 
 
@@ -46,18 +46,50 @@ class Scene:
             entity.draw_entity(screen)
 
 
+class Enemy:
+    def __init__(self, x, y, enemy_type):
+        self.__x = x
+        self.__y = y
+
+        self.__name = ENEMY_TYPES[enemy_type][0]
+
+        self.__health = ENEMY_TYPES[enemy_type][1]
+        self.__dmg = ENEMY_TYPES[enemy_type][2]
+        self.__speed = ENEMY_TYPES[enemy_type][3]
+        self.__is_poisonous = ENEMY_TYPES[enemy_type][4]
+
+        self.__width = ENEMY_TYPES[enemy_type][5]
+        self.__height = ENEMY_TYPES[enemy_type][6]
+        self.__rect = pygame.Rect(self.__x, self.__y, self.__width, self.__height)
+
+        self.__alive = True
+
+    def __get_damage(self):
+        self.__health -= 1
+        self.__alive = self.__health > 0
+
+    def __check_enemy_collision(self, wesker: Wesker):
+        ...
+
+    def check_entity_logic(self, wesker: Wesker):
+        ...
+
+    def draw_entity(self, screen):
+        ...
+
+
 class Door:
-    def __init__(self, x, y, image_source, image_width, image_height, scene_id, go_to_scene, font, door_type):
+    def __init__(self, x, image_source, image_width, image_height, scene_id, go_to_scene, font, door_type):
         self.entity_type = 'door'
         self.__image_source = image_source
         self.__image_width = image_width
         self.__image_height = image_height
 
         self.__prompt_color = pygame.Color(250, 250, 250)
-        self.__prompt_text = 'walk through the door' if door_type else 'go up the stairs'
+        self.__prompt_text = DOOR_TYPES[door_type]
 
         self.__x_coord = x
-        self.__y_coord = y
+        self.__y_coord = ACTUAL_HEIGHT - self.__image_height
         self.__rect = pygame.Rect(self.__x_coord, self.__y_coord, self.__image_width, self.__image_height)
 
         self.__scene_id = scene_id
@@ -70,7 +102,7 @@ class Door:
         self.__check_door_collision(wesker)
 
     def __check_door_collision(self, wesker: Wesker):
-        if self.__rect.colliderect(wesker.get_rect()):
+        if self.__rect.colliderect(wesker.get_hitbox_rect()):
             self.__action = True
         else:
             self.__action = False

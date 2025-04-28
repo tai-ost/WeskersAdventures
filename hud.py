@@ -104,7 +104,7 @@ class HUD:
             self.__poisoned_current_tick = pygame.time.get_ticks()
             if (self.__poisoned_current_tick - self.__poisoned_last_tick) > 1000:
                 self.__poisoned_last_tick = self.__poisoned_current_tick
-                self.__health_points -= 5
+                self.__health_points -= 1
         if self.__health_points > 75:
             self.__health_state = 'fine'
         elif self.__health_points > 50:
