@@ -54,7 +54,8 @@ class Wesker:
             pygame.K_w: False,
             pygame.K_s: False,
             pygame.K_a: False,
-            pygame.K_d: False
+            pygame.K_d: False,
+            pygame.K_SPACE: False
         }
 
         self.__last_direction = False  # Флаг для определения idle/aiming состояния по окончании движения
@@ -123,7 +124,7 @@ class Wesker:
     def move(self):
         # Меняем скорость в зависимости от направления ускорения по оси X
         self.__x_velocity += self.__acceleration * (self.__direction[pygame.K_d] - self.__direction[pygame.K_a]) \
-                             * (not self.__aiming)
+                             * (not self.__aiming) * (not self.__firing) * (not self.__reloading)
 
         # Проверяем крайние случаи
         if not (self.__direction[pygame.K_a] or self.__direction[pygame.K_d]):
@@ -140,7 +141,9 @@ class Wesker:
 
         # Прыжок
         if self.__rect.y >= (ACTUAL_HEIGHT - self.__image_height - 15):
-            self.__y_velocity += self.__acceleration * (self.__direction[pygame.K_s] - self.__direction[pygame.K_w])
+            self.__y_velocity += self.__acceleration * (self.__direction[pygame.K_s] -
+                                                        (self.__direction[pygame.K_w] or
+                                                         self.__direction[pygame.K_SPACE]))
         self.__y_velocity += self.__gravity_acceleration
         if self.__y_velocity > self.__max_y_velocity:
             self.__y_velocity = self.__max_y_velocity
@@ -168,6 +171,7 @@ class Wesker:
         return image
 
     def __check_wesker_state(self):
+        # Перезарядка
         if self.__reloading:
             self.__x_velocity = 0
             reloading_duration = self.__reloading_end_time - self.__reloading_start_time
@@ -175,10 +179,11 @@ class Wesker:
             self.__reloading_end_time = pygame.time.get_ticks()
             if reloading_duration >= 1000:
                 self.__reloading = False
+        # Прицеливание / выстрел
         elif self.__aiming and (self.__rect.y >= (ACTUAL_HEIGHT - self.__rect.height)):
             self.__x_velocity = 0
             if self.__firing and (self.__firing_delay == 0) and (self.__ammo > 0):
-                self.__firing_delay = FPS // 2
+                self.__firing_delay = pygame.time.get_ticks() + 500
                 self.__ammo = max(0, self.__ammo - 1)
                 self.__state = self.__possible_states[12 + self.__last_direction]
             else:
@@ -213,8 +218,8 @@ class Wesker:
                 self.__last_running_frame = not self.__last_running_frame
 
         # Отсчитываем задержку перед следующей возможностью выстрелить
-        if self.__firing_delay > 0:
-            self.__firing_delay -= 1
+        if self.__firing_delay and (pygame.time.get_ticks() > self.__firing_delay):
+            self.__firing_delay = 0
 
     def change_x_position(self, new_x):
         self.__rect.x = new_x
