@@ -17,23 +17,25 @@ class Wesker:
         self.__rect = pygame.Rect(self.__x_coord, self.__y_coord, self.__image_width, self.__image_height)
         self.__hitbox_rect = pygame.Rect(self.__rect.x, self.__rect.y, self.__hitbox_width, self.__hitbox_height)
 
-        # Словарь с возможными состояниями и соответствующими им названиями изображений
-        self.__possible_states = {
-            0: 'wesker_idle_right',
-            1: 'wesker_idle_left',
-            2: 'wesker_running_right_frame_0',
-            3: 'wesker_running_right_frame_1',
-            4: 'wesker_running_left_frame_0',
-            5: 'wesker_running_left_frame_1',
-            6: 'wesker_jumping_right',
-            7: 'wesker_jumping_left',
-            8: 'wesker_falling_right',
-            9: 'wesker_falling_left',
-            10: 'wesker_aiming_right',
-            11: 'wesker_aiming_left',
-            12: 'wesker_firing_right',
-            13: 'wesker_firing_left'
-        }
+        # Кортеж с возможными состояниями и соответствующими им названиями изображений
+        self.__possible_states = (
+            'wesker_idle_right',                # 0
+            'wesker_idle_left',                 # 1
+            'wesker_running_right_frame_0',     # 2
+            'wesker_running_right_frame_1',     # 3
+            'wesker_running_left_frame_0',      # 4
+            'wesker_running_left_frame_1',      # 5
+            'wesker_jumping_right',             # 6
+            'wesker_jumping_left',              # 7
+            'wesker_falling_right',             # 8
+            'wesker_falling_left',              # 9
+            'wesker_aiming_right',              # 10
+            'wesker_aiming_left',               # 11
+            'wesker_firing_right',              # 12
+            'wesker_firing_left',               # 13
+            'wesker_reloading_frame_0',         # 14
+            'wesker_reloading_frame_1'          # 15
+        )
 
         self.__state = self.__possible_states[0]  # Текущее состояние
         self.__last_running_frame = False  # Последний использованный кадр при движении (0 или 1)
@@ -58,6 +60,10 @@ class Wesker:
         self.__last_direction = False  # Флаг для определения idle/aiming состояния по окончании движения
 
         self.__ammo = DEFAULT_AMMO_LOADED
+
+        self.__reloading = False
+        self.__reloading_start_time = 0
+        self.__reloading_end_time = 0
 
         self.__aiming = False
         self.__firing = False
@@ -89,6 +95,8 @@ class Wesker:
         return self.__ammo
 
     def reload(self, new_ammo):
+        self.__reloading = True
+        self.__reloading_start_time = self.__reloading_end_time = pygame.time.get_ticks()
         self.__ammo += new_ammo
 
     # def shot_fired(self):
@@ -160,7 +168,14 @@ class Wesker:
         return image
 
     def __check_wesker_state(self):
-        if self.__aiming and (self.__rect.y >= (ACTUAL_HEIGHT - self.__rect.height)):
+        if self.__reloading:
+            self.__x_velocity = 0
+            reloading_duration = self.__reloading_end_time - self.__reloading_start_time
+            self.__state = self.__possible_states[14 + (reloading_duration > 500)]
+            self.__reloading_end_time = pygame.time.get_ticks()
+            if reloading_duration >= 1000:
+                self.__reloading = False
+        elif self.__aiming and (self.__rect.y >= (ACTUAL_HEIGHT - self.__rect.height)):
             self.__x_velocity = 0
             if self.__firing and (self.__firing_delay == 0) and (self.__ammo > 0):
                 self.__firing_delay = FPS // 2

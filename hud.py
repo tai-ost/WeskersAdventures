@@ -67,6 +67,9 @@ class HUD:
     def update_ammo(self, ammo):
         self.__ammo_loaded = ammo
 
+    def get_ammo_stored(self):
+        return self.__ammo_stored
+
     def reload(self):
         needed_ammo = DEFAULT_AMMO_LOADED - self.__ammo_loaded
         if self.__ammo_stored < needed_ammo:
@@ -90,8 +93,8 @@ class HUD:
         ammo_surface = self.__font.render(f'Ammo: {self.__ammo_loaded}/{self.__ammo_stored}',
                                           1, self.__ammo_text_color)
         ammo_rect = ammo_surface.get_rect()
-        ammo_rect.x = 0
-        ammo_rect.y = 0
+        ammo_rect.x = 10
+        ammo_rect.y = 10
         screen.blit(ammo_surface, ammo_rect)
 
     def draw_hud(self, screen):

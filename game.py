@@ -70,7 +70,8 @@ class Game:
                 ...
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_h):
                 self.__hud.hide_or_show()
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_r) and (self.__wesker.get_ammo() < 15):
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_r) and \
+                    (self.__wesker.get_ammo() < 15) and (self.__hud.get_ammo_stored() > 0):
                 self.__wesker.reload(self.__hud.reload())
 
     def __check_logic(self):
