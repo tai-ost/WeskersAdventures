@@ -55,7 +55,7 @@ class Game:
     def __check_events(self):
         self.__hud.update_ammo(self.__wesker.get_ammo())
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if (event.type == pygame.QUIT) or (self.__hud.get_health_points() <= 0):
                 self.__running = False
             elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
                 self.__wesker.check_aiming_event(event)
@@ -73,6 +73,12 @@ class Game:
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_r) and \
                     (self.__wesker.get_ammo() < 15) and (self.__hud.get_ammo_stored() > 0):
                 self.__wesker.reload(self.__hud.reload())
+            elif (event.type == pygame.KEYDOWN) and (event.key in self.__hud.get_inventory_keys()):
+                self.__hud.activate_inventory_slot(event.key)
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_5):
+                self.__hud.inventory_passive()
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_p):  # delete after creating enemies
+                self.__hud.got_poisoned()
 
     def __check_logic(self):
         self.__wesker.check_wesker_logic()
@@ -124,7 +130,7 @@ class Game:
 
     def __prepare_font(self):
         self.__font_re = pygame.font.Font('fonts/re_font.ttf', 30)
-        self.__font_special = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 30)
+        self.__font_special = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
 
     def __prepare_hud(self):
         self.__hud = HUD(self.__font_special)
