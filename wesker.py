@@ -58,7 +58,8 @@ class Wesker:
             pygame.K_SPACE: False
         }
 
-        self.__last_direction = False  # Флаг для определения idle/aiming состояния по окончании движения
+        # Флаг для определения idle/aiming состояния по окончании движения, False = right, True = Left
+        self.__last_direction = False
 
         self.__ammo = DEFAULT_AMMO_LOADED
 
@@ -69,7 +70,7 @@ class Wesker:
         self.__aiming = False
         self.__firing = False
         self.__firing_delay = 0
-        self.__have_fired = False
+        self.have_fired = False
 
     def get_movement_keys(self):
         return self.__direction.keys()
@@ -100,8 +101,8 @@ class Wesker:
         self.__reloading_start_time = self.__reloading_end_time = pygame.time.get_ticks()
         self.__ammo += new_ammo
 
-    # def shot_fired(self):
-    #     return self.__have_fired, self.__last_direction
+    def get_last_direction(self):
+        return self.__last_direction
 
     def check_wesker_logic(self):
         self.__check_wall_collision()
@@ -188,6 +189,7 @@ class Wesker:
             self.__x_velocity = self.__y_velocity = 0
             if self.__firing and (self.__firing_delay == 0) and (self.__ammo > 0):
                 self.__firing_delay = pygame.time.get_ticks() + 500
+                self.have_fired = True
                 self.__ammo = max(0, self.__ammo - 1)
                 self.__state = self.__possible_states[12 + self.__last_direction]
             else:

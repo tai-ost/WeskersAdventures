@@ -13,13 +13,13 @@ DOOR_TYPES = (
     'go up the stairs',
     'go down the stairs'
 )
-# (name, health, dmg, speed, is_poisonous, width, height)
+# (name, health, dmg, velocity, is_poisonous, width, height)
 ENEMY_TYPES = (
-    ('zombie', 3, 25, 5, False, 100, 200),
-    ('crimson_head', 3, 25, 7, False, 100, 200),
-    ('cerberus', 2, 25, 10, False, 100, 50),
-    ('adder', 1, 1, 10, True, 100, 20),
-    ('hunter', 5, 40, 5, True, 200, 200),
-    ('chimera', 2, 25, 8, False, 100, 200),
-    ('lisa_trevor', 20, 20, 3, False, 150, 200)
+    ('zombie', 3, 25, 2, False, 100, 200),
+    ('crimson_head', 3, 25, 3, False, 100, 200),
+    ('cerberus', 2, 10, 5, False, 100, 50),
+    ('adder', 1, 1, 5, True, 100, 20),
+    ('hunter', 5, 40, 2, True, 200, 200),
+    ('chimera', 2, 10, 5, False, 100, 200),
+    ('lisa_trevor', 20, 20, 1, False, 150, 200)
 )

@@ -45,6 +45,10 @@ class HUD:
 
         self.__health_points = 100
         self.__health_state = 'fine'
+
+        self.__grace = False
+        self.__grace_period = 0
+
         self.__poisoned = False
         self.__poisoned_last_tick = 0
         self.__poisoned_current_tick = 0
@@ -95,6 +99,12 @@ class HUD:
         self.inventory_passive()
         self.__inventory[slot_number].change_to_active()
 
+    def get_damage(self, dmg, is_poisonous):
+        if not self.__grace_period:
+            self.__health_points -= dmg
+            self.__poisoned = is_poisonous
+            self.__grace_period = pygame.time.get_ticks() + 1000
+
     def got_poisoned(self):
         self.__poisoned = not self.__poisoned  # Заглушка пока нет врагов с отравлением
         self.__poisoned_last_tick = self.__poisoned_current_tick = pygame.time.get_ticks()
@@ -113,6 +123,9 @@ class HUD:
             self.__health_state = 'caution_orange'
         else:
             self.__health_state = 'danger'
+
+        if self.__grace_period and (pygame.time.get_ticks() > self.__grace_period):
+            self.__grace_period = 0
 
     def update_ammo(self, ammo):
         self.__ammo_loaded = ammo

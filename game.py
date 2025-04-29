@@ -3,7 +3,7 @@ import pygame
 from constants import WIDTH, HEIGHT, FPS, ACTUAL_HEIGHT, FLOOR_HEIGHT
 from wesker import Wesker
 from hud import HUD
-from scenes import Scene, Door
+from scenes import Scene, Door, Enemy
 
 
 class Game:
@@ -82,8 +82,8 @@ class Game:
 
     def __check_logic(self):
         self.__wesker.check_wesker_logic()
+        self.__scenes[self.__current_scene].check_scene_logic(self.__wesker, self.__hud)
         self.__hud.check_health()
-        self.__scenes[self.__current_scene].check_scene_logic(self.__wesker)
 
     def __move(self):
         self.__wesker.move()
@@ -139,28 +139,31 @@ class Game:
         scene_0_entities = [
             Door(WIDTH - 170,
                  'door_var_1', 150, 270,
-                 0, 1, self.__font_re, 0),
+                 0, 1, 0, self.__font_re),
             Door(20,
                  'door_var_2', 150, 270,
-                 0, 2, self.__font_re, 0)
+                 0, 2, 0, self.__font_re)
         ]
 
         scene_1_entities = [
             Door(WIDTH - 170,
                  'door_var_1', 150, 270,
-                 1, 0, self.__font_re, 1),
+                 1, 0, 1, self.__font_re),
             Door(20,
                  'door_var_2', 150, 270,
-                 1, 2, self.__font_re, 1)
+                 1, 2, 1, self.__font_re),
+            Enemy(self.__width // 2, 0),
+            Enemy(self.__width // 3, 0),
+            Enemy(self.__width // 4, 0)
         ]
 
         scene_2_entities = [
             Door(WIDTH - 170,
                  'door_var_1', 150, 270,
-                 2, 0, self.__font_re, 2),
+                 2, 0, 2, self.__font_re),
             Door(20,
                  'door_var_2', 150, 270,
-                 2, 1, self.__font_re, 2)
+                 2, 1,  2, self.__font_re)
         ]
 
         self.__scenes = [Scene(0, 'scene_1', scene_0_entities, self.__font_re),
