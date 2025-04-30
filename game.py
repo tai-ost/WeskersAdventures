@@ -3,7 +3,7 @@ import pygame
 from constants import WIDTH, HEIGHT, FPS, ACTUAL_HEIGHT, FLOOR_HEIGHT
 from wesker import Wesker
 from hud import HUD
-from scenes import Scene, Door, Enemy
+from scenes import Scene, Door, Enemy, EnvironmentItem
 
 
 class Game:
@@ -35,6 +35,7 @@ class Game:
 
         self.__hud: HUD
         self.__font_re: pygame.font.Font
+        self.__font_re_item: pygame.font.Font
         self.__font_special: pygame.font.Font
         self.__scenes: list
 
@@ -62,8 +63,9 @@ class Game:
             elif (event.type == pygame.KEYDOWN or event.type == pygame.KEYUP) and \
                     event.key in self.__wesker.get_movement_keys():
                 self.__wesker.check_movement_event(event)
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_f):
-                action_code, action = self.__scenes[self.__current_scene].check_scene_event(self.__wesker)
+            elif (event.type == pygame.KEYDOWN) and ((event.key == pygame.K_f) or (event.key == pygame.K_t)):
+                action_code, action = self.__scenes[self.__current_scene].check_scene_event(self.__wesker, self.__hud,
+                                                                                            event.key)
                 if action_code == 1:
                     self.__change_current_scene(action)
                     self.__alpha_level = 80
@@ -77,6 +79,8 @@ class Game:
                 self.__hud.activate_inventory_slot(event.key)
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_5):
                 self.__hud.inventory_passive()
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_u):
+                self.__hud.use_item()
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_p):  # delete after creating enemies
                 self.__hud.got_poisoned()
 
@@ -98,7 +102,7 @@ class Game:
 
     def __draw_scene(self):
         self.__draw_floor()
-        self.__scenes[self.__current_scene].draw(self.__screen)
+        self.__scenes[self.__current_scene].draw(self.__screen, self.__wesker)
 
     def __draw_floor(self):
         floor_color = (10, 10, 10)
@@ -130,6 +134,7 @@ class Game:
 
     def __prepare_font(self):
         self.__font_re = pygame.font.Font('fonts/re_font.ttf', 30)
+        self.__font_re_item = pygame.font.Font('fonts/re_font.ttf', 25)
         self.__font_special = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
 
     def __prepare_hud(self):
@@ -142,7 +147,9 @@ class Game:
                  0, 1, 0, self.__font_re),
             Door(20,
                  'door_var_2', 150, 270,
-                 0, 2, 0, self.__font_re)
+                 0, 2, 0, self.__font_re),
+            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_re_item),
+            EnvironmentItem(self.__width // 4, ACTUAL_HEIGHT - 80, 1, self.__font_re_item)
         ]
 
         scene_1_entities = [
@@ -154,7 +161,9 @@ class Game:
                  1, 2, 1, self.__font_re),
             Enemy(self.__width // 2, 0),
             Enemy(self.__width // 3, 0),
-            Enemy(self.__width // 4, 0)
+            Enemy(self.__width // 4, 0),
+            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_re_item),
+            EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_re_item)
         ]
 
         scene_2_entities = [
@@ -163,7 +172,9 @@ class Game:
                  2, 0, 2, self.__font_re),
             Door(20,
                  'door_var_2', 150, 270,
-                 2, 1,  2, self.__font_re)
+                 2, 1,  2, self.__font_re),
+            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_re_item),
+            EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_re_item)
         ]
 
         self.__scenes = [Scene(0, 'scene_1', scene_0_entities, self.__font_re),

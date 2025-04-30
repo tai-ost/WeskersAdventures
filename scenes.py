@@ -1,7 +1,7 @@
 import pygame
 
 
-from constants import WIDTH, HEIGHT, ACTUAL_HEIGHT, FLOOR_HEIGHT, DOOR_TYPES, ENEMY_TYPES, FPS
+from constants import WIDTH, HEIGHT, ACTUAL_HEIGHT, FLOOR_HEIGHT, DOOR_TYPES, ENEMY_TYPES, ITEM_TYPES, FPS
 from wesker import Wesker
 from hud import HUD
 
@@ -18,37 +18,39 @@ class Scene:
 
         self.__font = font
 
-        # self.__enemy_took_damage = False
-
     def get_entities(self):
         return self.__entities
 
-    def check_scene_event(self, wesker: Wesker):
-        entity: Door | Enemy
+    def check_scene_event(self, wesker: Wesker, hud: HUD, event_key):
+        entity: Door | Enemy | EnvironmentItem
         for entity in self.__entities:
-            if entity.entity_type == 'door' and entity.scene_change_allowed():
+            if entity.entity_type == 'door' and entity.scene_change_allowed() and event_key == pygame.K_f:
                 wesker.change_x_position(entity.get_x_position())
                 return 1, entity.go_to_scene
+            elif entity.entity_type == 'item' and entity.taking_allowed() and \
+                    (hud.inventory_empty_slot() != 5) and event_key == pygame.K_t:
+                entity.get_taken()
+                hud.add_item(entity.get_item_type(), hud.inventory_empty_slot())
         return 0, 0
 
     def check_scene_logic(self, wesker: Wesker, hud: HUD):
-        entity: Door | Enemy
+        entity: Door | Enemy | EnvironmentItem
         for entity in self.__entities:
             entity.check_entity_logic(wesker, hud)
 
         wesker.have_fired = False
 
-    def draw(self, screen):
+    def draw(self, screen, wesker: Wesker):
         self.__draw_background(screen)
-        self.__draw_entities(screen)
+        self.__draw_entities(screen, wesker)
 
     def __draw_background(self, screen):
         screen.blit(self.__background_image, self.__background_rect)
 
-    def __draw_entities(self, screen):
-        entity: Door | Enemy
+    def __draw_entities(self, screen, wesker: Wesker):
+        entity: Door | Enemy | EnvironmentItem
         for entity in self.__entities:
-            entity.draw_entity(screen)
+            entity.draw_entity(screen, wesker)
 
 
 class Enemy:
@@ -127,8 +129,77 @@ class Enemy:
             )
         return image
 
-    def draw_entity(self, screen):
+    def draw_entity(self, screen, _):
         screen.blit(self.__load_image(), self.__rect)
+
+
+class EnvironmentItem:
+    def __init__(self, x, y, item_type, font: pygame.font.Font):
+        self.entity_type: str = 'item'
+        self.__item_type = item_type
+        self.__item_name: str = ITEM_TYPES[item_type][0]
+
+        self.__width: int = ITEM_TYPES[item_type][1]
+        self.__height: int = ITEM_TYPES[item_type][2]
+
+        self.__prompt_text: str = f'Take {ITEM_TYPES[item_type][3]}'
+        self.__prompt_color: pygame.Color = pygame.Color(250, 250, 250)
+
+        self.__x: int = x
+        self.__y: int = y
+        self.__rect: pygame.Rect = pygame.Rect(self.__x, self.__y, self.__width, self.__height)
+
+        self.__font: pygame.font.Font = font
+        self.__taken = False
+        self.__action = False
+
+    def check_entity_logic(self, wesker: Wesker, hud: HUD):
+        self.__check_item_collision(wesker)
+        ...
+
+    def __check_item_collision(self, wesker: Wesker):
+        if self.__rect.colliderect(wesker.get_hitbox_rect()):
+            self.__action = True
+        else:
+            self.__action = False
+
+    def taking_allowed(self):
+        return self.__action
+
+    def get_taken(self):
+        self.__taken = True
+
+    def get_item_type(self):
+        return self.__item_type
+
+    def __show_prompt(self, screen, wesker: Wesker):
+        button_x, button_y = wesker.get_hitbox_rect().x, wesker.get_hitbox_rect().y
+        button_rect = pygame.Rect(button_x - 50, button_y - 50, 50, 50)
+        button_image = pygame.transform.scale(
+            pygame.image.load(f'images/entity_img/env_item_img/key_t.png').convert_alpha(),
+            (40, 40),
+        )
+
+        prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
+        prompt_rect = prompt_surface.get_rect()
+        prompt_rect.x = button_rect.x + 50
+        prompt_rect.y = button_rect.y + 12
+
+        screen.blit(button_image, button_rect)
+        screen.blit(prompt_surface, prompt_rect)
+
+    def __load_image(self):
+        image = pygame.transform.scale(
+            pygame.image.load(f'images/entity_img/env_item_img/{self.__item_name}.png').convert_alpha(),
+            (self.__width, self.__height),
+        )
+        return image
+
+    def draw_entity(self, screen, wesker: Wesker):
+        if not self.__taken:
+            screen.blit(self.__load_image(), self.__rect)
+            if self.__action:
+                self.__show_prompt(screen, wesker)
 
 
 class Door:
@@ -142,9 +213,9 @@ class Door:
         self.__prompt_color = pygame.Color(250, 250, 250)
         self.__prompt_text = DOOR_TYPES[door_type]
 
-        self.__x_coord = x
-        self.__y_coord = ACTUAL_HEIGHT - self.__image_height
-        self.__rect = pygame.Rect(self.__x_coord, self.__y_coord, self.__image_width, self.__image_height)
+        self.__x = x
+        self.__y = ACTUAL_HEIGHT - self.__image_height
+        self.__rect = pygame.Rect(self.__x, self.__y, self.__image_width, self.__image_height)
 
         self.__scene_id = scene_id
         self.go_to_scene = go_to_scene
@@ -160,7 +231,6 @@ class Door:
             self.__action = True
         else:
             self.__action = False
-        ...
 
     def get_x_position(self):
         return self.__rect.x
@@ -171,7 +241,7 @@ class Door:
     def __show_prompt(self, screen):
         button_rect = pygame.Rect(WIDTH // 2 - 200, ACTUAL_HEIGHT + 10, 50, 50)
         button_image = pygame.transform.scale(
-            pygame.image.load(f'images/entity_img/key_f.png').convert_alpha(),
+            pygame.image.load(f'images/entity_img/door_img/key_f.png').convert_alpha(),
             (50, 50),
         )
 
@@ -185,12 +255,12 @@ class Door:
 
     def __load_image(self):
         image = pygame.transform.scale(
-            pygame.image.load(f'images/entity_img/{self.__image_source}.png').convert_alpha(),
+            pygame.image.load(f'images/entity_img/door_img/{self.__image_source}.png').convert_alpha(),
             (self.__image_width, self.__image_height),
         )
         return image
 
-    def draw_entity(self, screen):
+    def draw_entity(self, screen, _):
         screen.blit(self.__load_image(), self.__rect)
         if self.__action:
             self.__show_prompt(screen)

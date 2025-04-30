@@ -1,21 +1,30 @@
 import pygame
 
-from constants import (ITEM_WIDTH, ITEM_HEIGHT,
+from constants import (ITEM_WIDTH, ITEM_HEIGHT, ITEM_TYPES,
                        INVENTORY_SLOT_WIDTH, INVENTORY_SLOT_HEIGHT,
                        DEFAULT_AMMO_LOADED, DEFAULT_AMMO_STORED)
 
 
 class Item:
-    def __init__(self, name, image_source=None, action=None):
+    def __init__(self, name, action=None):
         self.__name = name
         self.__active = False
 
-        self.__image_source = image_source
         self.__action = action
         ...
 
     def get_name(self):
         return self.__name
+
+    def configure_item(self, item_type: int):
+        self.__name = ITEM_TYPES[item_type][0]
+        self.__action = item_type
+
+    def set_to_default(self):
+        self.__name = None
+        self.__active = False
+
+        self.__action = None
 
     def change_to_active(self):
         self.__active = True
@@ -31,7 +40,7 @@ class Item:
 
     def load_image(self):
         image = pygame.transform.scale(
-            pygame.image.load(f'images/item_img/{self.__image_source}.png').convert_alpha(),
+            pygame.image.load(f'images/item_img/inventory_{self.__name}.png').convert_alpha(),
             (ITEM_WIDTH, ITEM_HEIGHT),
         )
         return image
@@ -68,24 +77,50 @@ class HUD:
             Item(None),
             Item(None)
         ]
-        self.__current_slot = 0
+        self.__current_slot = 4
         self.__slot = 'inventory_slot'
 
         self.__ammo_text_color = pygame.Color(150, 150, 150)
         self.__health_rect = pygame.Rect(0, 0, 160, 80)
         self.__ammo_box_rect = pygame.Rect(0, self.__health_rect.height, 160, 40)
+
+        self.__defensive_item_count = 8
+        self.__defensive_item_count_color = pygame.Color(150, 150, 150)
+        self.__defensive_item_box_rect = pygame.Rect(480, 0, 80, 80)
         ...
 
     def hide_or_show(self):
         self.__hidden = not self.__hidden
 
-    def add_item(self, item: Item):
-        ...
+    def inventory_empty_slot(self):
+        for i in range(4):
+            if not self.__inventory[i].get_name():
+                return i
+        return 5
+
+    def add_item(self, item_type: int, slot: int):
+        self.__inventory[slot].configure_item(item_type)
 
     def use_item(self):
-        action = self.__inventory[self.__current_slot].action()
-        if action == 1:
-            ...
+        if self.__current_slot != 4:
+            action = self.__inventory[self.__current_slot].action()
+            # First Aid Spray
+            if action == 1:
+                self.__health_points = 100
+            # Green Herb
+            elif action == 2:
+                self.__health_points = min(100, self.__health_points + 30)
+            # Red Herb
+            elif action == 3:
+                ...
+            # Blue Herb
+            elif action == 4:
+                self.__poisoned = False
+            # Dagger
+            elif action == 5:
+                self.__defensive_item_count += 1
+
+            self.__inventory[self.__current_slot].set_to_default()
 
     def get_inventory_keys(self):
         return self.__inventory_keys.keys()
@@ -93,20 +128,25 @@ class HUD:
     def inventory_passive(self):
         for i in range(4):
             self.__inventory[i].change_to_passive()
+        self.__current_slot = 4
 
     def activate_inventory_slot(self, key):
         slot_number = self.__inventory_keys[key]
         self.inventory_passive()
         self.__inventory[slot_number].change_to_active()
+        self.__current_slot = self.__inventory_keys[key]
 
     def get_damage(self, dmg, is_poisonous):
         if not self.__grace_period:
-            self.__health_points -= dmg
-            self.__poisoned = is_poisonous
+            if not self.__defensive_item_count:
+                self.__health_points -= dmg
+                self.__poisoned = is_poisonous
+            else:
+                self.__defensive_item_count = max(0, self.__defensive_item_count - 1)
             self.__grace_period = pygame.time.get_ticks() + 1000
 
     def got_poisoned(self):
-        self.__poisoned = not self.__poisoned  # Заглушка пока нет врагов с отравлением
+        self.__poisoned = not self.__poisoned
         self.__poisoned_last_tick = self.__poisoned_current_tick = pygame.time.get_ticks()
 
     def check_health(self):
@@ -145,30 +185,51 @@ class HUD:
         self.__ammo_stored -= needed_ammo
         return needed_ammo
 
-    def __load_inventory_slot_image(self, slot_number):
-        if self.__inventory[slot_number].get_name():
-            ...
-        else:
-            slot_state = '_active' if self.__inventory[slot_number].get_state() else ''
-            image = pygame.transform.scale(
-                pygame.image.load(f'images/hud_img/{self.__slot + slot_state}.png').convert_alpha(),
-                (INVENTORY_SLOT_WIDTH, INVENTORY_SLOT_HEIGHT),
+    def __load_health_state_image(self):
+        poison = 'poison_' if self.__poisoned else ''
+        image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/health_states/{poison + self.__health_state}.png').convert_alpha(),
+            (160, 80),
+        )
+        return image
+
+    def __show_health(self, screen):
+        screen.blit(self.__load_health_state_image(), self.__health_rect)
+
+    def __load_inventory_slot_image(self, slot_number: int):
+        slot_state = '_active' if self.__inventory[slot_number].get_state() else ''
+        slot_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/{self.__slot + slot_state}.png').convert_alpha(),
+            (INVENTORY_SLOT_WIDTH, INVENTORY_SLOT_HEIGHT),
+        )
+        return slot_image
+
+    def __load_inventory_item_image(self, slot_number: int):
+        item_name = self.__inventory[slot_number].get_name()
+        if item_name:
+            item_image = pygame.transform.scale(
+                pygame.image.load(
+                    f'images/hud_img/item_img/inventory_{item_name}.png'
+                ).convert_alpha(),
+                (ITEM_WIDTH, ITEM_HEIGHT),
             )
-            return image
+        else:
+            item_image = pygame.transform.scale(
+                pygame.image.load(
+                    f'images/hud_img/item_img/nothing_img.png'
+                ).convert_alpha(),
+                (ITEM_WIDTH, ITEM_HEIGHT),
+            )
+        return item_image
 
     def __show_inventory(self, screen):
         for slot_number in range(4):
             slot_rect = pygame.Rect(self.__health_rect.width + INVENTORY_SLOT_WIDTH * slot_number, 0,
                                     INVENTORY_SLOT_WIDTH, INVENTORY_SLOT_HEIGHT)
+            item_rect = pygame.Rect(self.__health_rect.width + INVENTORY_SLOT_WIDTH * slot_number + 13, 13,
+                                    ITEM_WIDTH, ITEM_HEIGHT)
             screen.blit(self.__load_inventory_slot_image(slot_number), slot_rect)
-
-    def __load_health_state_image(self):
-        poison = 'poison_' if self.__poisoned else ''
-        image = pygame.transform.scale(
-            pygame.image.load(f'images/hud_img/{poison + self.__health_state}.png').convert_alpha(),
-            (160, 80),
-        )
-        return image
+            screen.blit(self.__load_inventory_item_image(slot_number), item_rect)
 
     def __show_ammo(self, screen):
         ammo_surface = self.__font.render(f'Ammo: {self.__ammo_loaded}/{self.__ammo_stored}',
@@ -178,14 +239,30 @@ class HUD:
         ammo_rect.y = self.__ammo_box_rect.y + 10
 
         ammo_box_image = pygame.transform.scale(
-                pygame.image.load(f'images/hud_img/ammo_box.png').convert_alpha(),
+                pygame.image.load(f'images/hud_img/other/ammo_box.png').convert_alpha(),
                 (self.__ammo_box_rect.width, self.__ammo_box_rect.height),
             )
         screen.blit(ammo_box_image, self.__ammo_box_rect)
         screen.blit(ammo_surface, ammo_rect)
 
+    def __show_defensive_item(self, screen):
+        defensive_item_surface = self.__font.render(f'x{self.__defensive_item_count}',
+                                                    1, self.__defensive_item_count_color)
+        defensive_item_rect = defensive_item_surface.get_rect()
+        defensive_item_rect.x = self.__defensive_item_box_rect.x + 25
+        defensive_item_rect.y = self.__defensive_item_box_rect.y + 45
+
+        defensive_item_box_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/defensive_item_box.png').convert_alpha(),
+            (self.__defensive_item_box_rect.width, self.__defensive_item_box_rect.height),
+        )
+        screen.blit(defensive_item_box_image, self.__defensive_item_box_rect)
+        screen.blit(defensive_item_surface, defensive_item_rect)
+
     def draw_hud(self, screen):
         if not self.__hidden:
-            screen.blit(self.__load_health_state_image(), self.__health_rect)
+            self.__show_health(screen)
             self.__show_ammo(screen)
             self.__show_inventory(screen)
+            if self.__defensive_item_count:
+                self.__show_defensive_item(screen)
