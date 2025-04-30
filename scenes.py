@@ -168,6 +168,7 @@ class EnvironmentItem:
 
     def get_taken(self):
         self.__taken = True
+        self.__action = False
 
     def get_item_type(self):
         return self.__item_type

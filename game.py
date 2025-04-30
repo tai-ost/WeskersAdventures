@@ -81,6 +81,8 @@ class Game:
                 self.__hud.inventory_passive()
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_u):
                 self.__hud.use_item()
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_c):
+                self.__hud.combine_herbs()
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_p):  # delete after creating enemies
                 self.__hud.got_poisoned()
 
@@ -133,8 +135,6 @@ class Game:
         self.__prepare_scenes()
 
     def __prepare_font(self):
-        self.__font_re = pygame.font.Font('fonts/re_font.ttf', 30)
-        self.__font_re_item = pygame.font.Font('fonts/re_font.ttf', 25)
         self.__font_special = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
 
     def __prepare_hud(self):
@@ -144,42 +144,43 @@ class Game:
         scene_0_entities = [
             Door(WIDTH - 170,
                  'door_var_1', 150, 270,
-                 0, 1, 0, self.__font_re),
+                 0, 1, 0, self.__font_special),
             Door(20,
                  'door_var_2', 150, 270,
-                 0, 2, 0, self.__font_re),
-            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_re_item),
-            EnvironmentItem(self.__width // 4, ACTUAL_HEIGHT - 80, 1, self.__font_re_item)
+                 0, 2, 0, self.__font_special),
+            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 100, 2, self.__font_special),
+            EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 100, 3, self.__font_special),
+            EnvironmentItem(self.__width // 4, ACTUAL_HEIGHT - 100, 4, self.__font_special)
         ]
 
         scene_1_entities = [
             Door(WIDTH - 170,
                  'door_var_1', 150, 270,
-                 1, 0, 1, self.__font_re),
+                 1, 0, 1, self.__font_special),
             Door(20,
                  'door_var_2', 150, 270,
-                 1, 2, 1, self.__font_re),
+                 1, 2, 1, self.__font_special),
             Enemy(self.__width // 2, 0),
             Enemy(self.__width // 3, 0),
             Enemy(self.__width // 4, 0),
-            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_re_item),
-            EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_re_item)
+            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_special),
+            EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_special)
         ]
 
         scene_2_entities = [
             Door(WIDTH - 170,
                  'door_var_1', 150, 270,
-                 2, 0, 2, self.__font_re),
+                 2, 0, 2, self.__font_special),
             Door(20,
                  'door_var_2', 150, 270,
-                 2, 1,  2, self.__font_re),
-            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_re_item),
-            EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_re_item)
+                 2, 1,  2, self.__font_special),
+            EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_special),
+            EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_special)
         ]
 
-        self.__scenes = [Scene(0, 'scene_1', scene_0_entities, self.__font_re),
-                         Scene(1, 'scene_2', scene_1_entities, self.__font_re),
-                         Scene(2, 'scene_3', scene_2_entities, self.__font_re)]
+        self.__scenes = [Scene(0, 'scene_1', scene_0_entities, self.__font_special),
+                         Scene(1, 'scene_2', scene_1_entities, self.__font_special),
+                         Scene(2, 'scene_3', scene_2_entities, self.__font_special)]
 
     def __del__(self):
         pygame.quit()

@@ -10,9 +10,9 @@ DEFAULT_AMMO_LOADED = 15
 DEFAULT_AMMO_STORED = 30
 
 DOOR_TYPES = (
-    'walk through the door',  # 0 - door
-    '  go up the stairs',     # 1 - stairs up
-    ' go down the stairs'     # 2 - stairs down
+    'Walk through the door',  # 0 - door
+    '  Go up the stairs',     # 1 - stairs up
+    ' Go down the stairs'     # 2 - stairs down
 )
 
 # (name, health, dmg, velocity, is_poisonous, width, height)
@@ -29,10 +29,14 @@ ENEMY_TYPES = (
 # item_name, env_width, env_height, in_game_name
 ITEM_TYPES = (
     None,
-    ('first_aid_spray', 50, 80, 'First Aid Spray'),
-    ('green_herb', 50, 50, 'Green Herb'),
-    ('red_herb', 50, 50, 'Red Herb'),
-    ('blue_herb', 50, 50, 'Blue Herb'),
-    ('dagger', 50, 50, 'Dagger'),
-    ('handgun_ammo', 50, 50, 'Handgun Ammo')
+    ('first_aid_spray', 50, 80, 'First Aid Spray'),    # 1
+    ('green_herb', 70, 100, 'Green Herb'),              # 2
+    ('red_herb', 70, 100, 'Red Herb'),                  # 3
+    ('blue_herb', 70, 100, 'Blue Herb'),                # 4
+    ('dagger', 50, 50, 'Dagger'),                      # 5
+    ('handgun_ammo', 50, 50, 'Handgun Ammo'),          # 6
+    ('mixed_g_r', 50, 50, 'Mixed Herbs (G + R)'),      # 7
+    ('mixed_g_b', 50, 50, 'Mixed Herbs (G + B)'),      # 8
+    ('mixed_g_g', 50, 50, 'Mixed Herbs (G + G)'),      # 9
+    ('mixed_all', 50, 50, 'Mixed Herbs (G + R + B)')   # 10
 )
