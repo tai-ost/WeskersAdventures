@@ -9,12 +9,6 @@ ITEM_WIDTH = ITEM_HEIGHT = 54
 DEFAULT_AMMO_LOADED = 15
 DEFAULT_AMMO_STORED = 30
 
-DOOR_TYPES = (
-    'Walk through the door',  # 0 - door
-    '  Go up the stairs',     # 1 - stairs up
-    ' Go down the stairs'     # 2 - stairs down
-)
-
 # (name, health, dmg, velocity, is_poisonous, width, height)
 ENEMY_TYPES = (
     ('zombie', 3, 25, 2, False, 100, 200),

@@ -1,6 +1,7 @@
 import pygame
 
-from constants import (ITEM_WIDTH, ITEM_HEIGHT, ITEM_TYPES,
+from constants import (WIDTH,
+                       ITEM_WIDTH, ITEM_HEIGHT, ITEM_TYPES,
                        INVENTORY_SLOT_WIDTH, INVENTORY_SLOT_HEIGHT,
                        DEFAULT_AMMO_LOADED, DEFAULT_AMMO_STORED)
 
@@ -47,6 +48,9 @@ class HUD:
 
         self.__font: pygame.font.Font = font
 
+        self.__timer = 0
+        self.__timer_color = pygame.Color(250, 250, 250)
+
         self.__health_points = 100
         self.__health_state = 'fine'
 
@@ -81,7 +85,7 @@ class HUD:
         self.__health_rect = pygame.Rect(0, 0, 160, 80)
         self.__ammo_box_rect = pygame.Rect(0, self.__health_rect.height, 160, 40)
 
-        self.__defensive_item_count = 8
+        self.__defensive_item_count = 1
         self.__defensive_item_count_color = pygame.Color(150, 150, 150)
         self.__defensive_item_box_rect = pygame.Rect(480, 0, 80, 80)
 
@@ -239,6 +243,9 @@ class HUD:
         if self.__grace_period and (pygame.time.get_ticks() > self.__grace_period):
             self.__grace_period = 0
 
+    def update_time(self, time_passed):
+        self.__timer = time_passed
+
     def update_ammo(self, ammo):
         self.__ammo_loaded = ammo
 
@@ -345,11 +352,23 @@ class HUD:
         screen.blit(defensive_item_box_image, self.__defensive_item_box_rect)
         screen.blit(defensive_item_surface, defensive_item_rect)
 
+    def __show_timer(self, screen):
+        seconds = self.__timer // 1000
+        minutes = seconds // 60
+        seconds %= 60
+        time_surface = self.__font.render(f'{minutes:0>2}:{seconds:0>2}', 1, self.__timer_color)
+        time_rect = time_surface.get_rect()
+        time_rect.x = WIDTH - time_rect.width - 10
+        time_rect.y = 10
+
+        screen.blit(time_surface, time_rect)
+
     def draw_hud(self, screen):
         if not self.__hidden:
             self.__show_health(screen)
             self.__show_ammo(screen)
             self.__show_inventory(screen)
+            self.__show_timer(screen)
             if self.__defensive_item_count:
                 self.__show_defensive_item(screen)
             if (self.__current_slot != 4) and (self.__inventory[self.__current_slot].action()):

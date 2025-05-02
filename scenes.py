@@ -1,7 +1,7 @@
 import pygame
 
 
-from constants import WIDTH, HEIGHT, ACTUAL_HEIGHT, FLOOR_HEIGHT, DOOR_TYPES, ENEMY_TYPES, ITEM_TYPES, FPS
+from constants import WIDTH, HEIGHT, ACTUAL_HEIGHT, FLOOR_HEIGHT, ENEMY_TYPES, ITEM_TYPES, FPS
 from wesker import Wesker
 from hud import HUD
 
@@ -25,8 +25,8 @@ class Scene:
         entity: Door | Enemy | EnvironmentItem
         for entity in self.__entities:
             if entity.entity_type == 'door' and entity.scene_change_allowed() and event_key == pygame.K_f:
-                wesker.change_x_position(entity.get_x_position())
-                return 1, entity.go_to_scene
+                wesker.change_x_position(entity.go_to_x_coords)
+                return 1, entity.go_to_scene_id
             elif entity.entity_type == 'item' and entity.taking_allowed() and \
                     (hud.inventory_empty_slot() != 5) and event_key == pygame.K_t:
                 entity.get_taken()
@@ -153,9 +153,8 @@ class EnvironmentItem:
         self.__taken = False
         self.__action = False
 
-    def check_entity_logic(self, wesker: Wesker, hud: HUD):
+    def check_entity_logic(self, wesker: Wesker, _):
         self.__check_item_collision(wesker)
-        ...
 
     def __check_item_collision(self, wesker: Wesker):
         if self.__rect.colliderect(wesker.get_hitbox_rect()):
@@ -204,22 +203,26 @@ class EnvironmentItem:
 
 
 class Door:
-    def __init__(self, x, image_source, image_width, image_height, scene_id, go_to_scene, door_type, font):
+    def __init__(self, x: int, image_source: str, image_width: int, image_height: int,
+                 scene_id: int, go_to_scene_id: int, go_to_scene_name: str, go_to_x_coords: int,
+                 font: pygame.font.Font):
         self.entity_type = 'door'
 
         self.__image_source = image_source
         self.__image_width = image_width
         self.__image_height = image_height
 
+        self.__scene_id = scene_id
+        self.go_to_scene_id = go_to_scene_id
+        self.__go_to_scene_name = go_to_scene_name
+        self.go_to_x_coords = go_to_x_coords
+
         self.__prompt_color = pygame.Color(250, 250, 250)
-        self.__prompt_text = DOOR_TYPES[door_type]
+        self.__prompt_text = f'Go to {self.__go_to_scene_name}'
 
         self.__x = x
         self.__y = ACTUAL_HEIGHT - self.__image_height
         self.__rect = pygame.Rect(self.__x, self.__y, self.__image_width, self.__image_height)
-
-        self.__scene_id = scene_id
-        self.go_to_scene = go_to_scene
 
         self.__font = font
         self.__action = False
@@ -233,23 +236,20 @@ class Door:
         else:
             self.__action = False
 
-    def get_x_position(self):
-        return self.__rect.x
-
     def scene_change_allowed(self):
         return self.__action
 
     def __show_prompt(self, screen):
-        button_rect = pygame.Rect(WIDTH // 2 - 200, ACTUAL_HEIGHT + 10, 50, 50)
+        prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
+        prompt_rect: pygame.Rect = prompt_surface.get_rect()
+        prompt_rect.x = WIDTH // 2 - prompt_rect.width // 2
+        prompt_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - prompt_rect.height // 2
+
+        button_rect = pygame.Rect(prompt_rect.x - 60, ACTUAL_HEIGHT + 10, 50, 50)
         button_image = pygame.transform.scale(
             pygame.image.load(f'images/entity_img/door_img/key_f.png').convert_alpha(),
             (50, 50),
         )
-
-        prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
-        prompt_rect = prompt_surface.get_rect()
-        prompt_rect.x = button_rect.x + 70
-        prompt_rect.y = button_rect.y + 15
 
         screen.blit(button_image, button_rect)
         screen.blit(prompt_surface, prompt_rect)
