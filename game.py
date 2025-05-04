@@ -4,6 +4,10 @@ from constants import WIDTH, HEIGHT, FPS, ACTUAL_HEIGHT, FLOOR_HEIGHT
 from wesker import Wesker
 from hud import HUD
 from scenes import Scene, Door, Enemy, EnvironmentItem
+from scripts import (script_main_hall, script_gh_corr, script_gh_gallery,
+                     script_enrico_room, script_altar, script_main_lab,
+                     script_east_wing_stairway, script_dark_corridor, script_garden_shed,
+                     script_generator_room, script_altar_after_fight)
 
 
 class Game:
@@ -34,6 +38,10 @@ class Game:
         self.__alpha_level: int = 0
 
         self.__wesker: Wesker = Wesker()
+
+        self.__lisa = True
+
+        self.__next_script = 1
 
         self.__menu: Menu
         self.__hud: HUD
@@ -76,7 +84,7 @@ class Game:
     def __check_events(self):
         self.__hud.update_ammo(self.__wesker.get_ammo())
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT) or (self.__hud.get_health_points() <= 0):
+            if (event.type == pygame.QUIT) or (self.__hud.get_health_points() <= 0) or (self.__next_script == 0):
                 self.__running = False
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE):
                 self.__in_menu = True
@@ -92,7 +100,6 @@ class Game:
                 if action_code == 1:
                     self.__change_current_scene(action)
                     self.__alpha_level = 80
-                ...
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_h):
                 self.__hud.hide_or_show()
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_r) and \
@@ -106,14 +113,139 @@ class Game:
                 self.__hud.use_item()
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_c):
                 self.__hud.combine_herbs()
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_p):  # delete after creating enemies
-                self.__hud.got_poisoned()
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_p):
+                self.__next_script = script_main_hall(self.__scenes[self.__current_scene], self.__wesker,
+                                                      self.__screen, self.__clock)
+                self.__wesker.change_x_velocity(0)
+                self.__wesker.change_y_velocity(0)
+                self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
 
     def __check_logic(self):
-        self.__wesker.check_wesker_logic()
+        self.__wesker.check_wesker_logic(self.__scenes[self.__current_scene])
         self.__scenes[self.__current_scene].check_scene_logic(self.__wesker, self.__hud)
         self.__hud.check_health()
         self.__hud.update_time(self.__time_passed)
+        self.__lisa = self.__hud.check_lisa_state()
+        self.__check_scripts()
+
+    def __check_scripts(self):
+        # Entry script
+        if (self.__current_scene == 0) and (self.__next_script == 1):
+            self.__next_script = script_main_hall(self.__scenes[self.__current_scene], self.__wesker,
+                                                  self.__screen, self.__clock)
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+        # East Wing Stairway script - Wesker leaves a note for Chris
+        elif (self.__current_scene == 6) and (self.__next_script == 2):
+            self.__next_script = script_east_wing_stairway(self.__scenes[self.__current_scene], self.__wesker,
+                                                           self.__screen, self.__clock)
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+            self.__scenes[6].add_entity(Door(WIDTH // 2, 'empty_door',
+                                             150, 270,
+                                             6, 7, 'East Wing Storeroom',
+                                             0, self.__font_special))
+
+            self.__scenes[5].add_entity(Door(0, 'empty_door',
+                                             150, 270,
+                                             5, 8, 'Roofed Passage',
+                                             WIDTH - 220, self.__font_special),)
+
+        # Dark Corridor script - Wesker repairs the doorknob
+        elif (self.__current_scene == 5) and (self.__next_script == 3):
+            self.__next_script = script_dark_corridor(self.__scenes[self.__current_scene], self.__wesker,
+                                                      self.__screen, self.__clock)
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+        # Garden Shed script - Wesker leaves a note for Chris
+        elif (self.__current_scene == 9) and (self.__next_script == 4):
+            self.__next_script = script_garden_shed(self.__scenes[self.__current_scene], self.__wesker,
+                                                    self.__screen, self.__clock)
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+        # Guardhouse Main Corridor script - Wesker meets Chris
+        elif (self.__current_scene == 25) and (self.__next_script == 5) and (self.__wesker.get_hitbox_rect().x > 640):
+            self.__next_script = script_gh_corr(self.__scenes[self.__current_scene], self.__wesker,
+                                                self.__screen, self.__clock)
+
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+            self.__scenes[11].add_entity(Door(WIDTH // 2 - 200, 'empty_door',
+                                              150, 270,
+                                              11, 12, 'the tunnel behind the Waterfall',
+                                              0, self.__font_special))
+
+        # Guardhouse Gallery script - Wesker hears Rebecca, decides to go to Generator Room
+        elif (self.__current_scene == 27) and (self.__next_script == 6):
+            self.__next_script = script_gh_gallery(self.__scenes[self.__current_scene], self.__wesker,
+                                                   self.__screen, self.__clock)
+
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+        # Generator Room script - Wesker hides from Chris, then follows him into Enrico Room
+        elif (self.__current_scene == 15) and (self.__next_script == 7) and (self.__wesker.get_hitbox_rect().x > 400):
+            self.__next_script = script_generator_room(self.__scenes[self.__current_scene], self.__wesker,
+                                                       self.__screen, self.__clock)
+
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+        # Enrico Room script - Wesker shots Enrico and runs away
+        elif (self.__current_scene == 16) and (self.__next_script == 8):
+            self.__next_script = script_enrico_room(self.__scenes[self.__current_scene], self.__wesker,
+                                                    self.__screen, self.__clock)
+
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+            self.__scenes[15].delete_last_entity()
+            self.__current_scene = 15
+            self.__wesker.change_x_position(WIDTH - 220)
+            self.__scenes[18].add_entity(Enemy(WIDTH - 300, 6))
+            self.__scenes[17].add_entity(Door(WIDTH // 2 - 75, 'empty_door',
+                                              150, 270,
+                                              17, 18, 'Altar', 40,
+                                              self.__font_special))
+
+        # Altar before fight script - Wesker finds Lisa, Chris enters the scene, the fight starts
+        elif (self.__current_scene == 18) and (self.__next_script == 9):
+            self.__next_script = script_altar(self.__scenes[self.__current_scene], self.__wesker,
+                                              self.__screen, self.__clock)
+
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+        # Altar after fight script - Wesker lets Chris go forward
+        elif (self.__current_scene == 18) and (self.__next_script == 10) and not self.__lisa:
+            self.__next_script = script_altar_after_fight(self.__scenes[self.__current_scene], self.__wesker,
+                                                          self.__screen, self.__clock)
+
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+        elif (self.__current_scene == 19) and (self.__next_script == 11):
+            self.__next_script = script_main_lab(self.__scenes[self.__current_scene], self.__wesker,
+                                                 self.__screen, self.__clock)
+
+            self.__wesker.change_x_velocity(0)
+            self.__wesker.change_y_velocity(0)
+            self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
 
     def __move(self):
         self.__wesker.move()
@@ -172,18 +304,6 @@ class Game:
         self.__hud = HUD(self.__font_special)
 
     def __prepare_scenes(self):
-        # scene_0_entities = [
-        #     Door(WIDTH - 170,
-        #          'door_var_1', 150, 270,
-        #          0, 1, 'scene2', WIDTH - 170, self.__font_special),
-        #     Door(20,
-        #          'door_var_2', 150, 270,
-        #          0, 2, 'scene3', WIDTH - 170, self.__font_special),
-        #     EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 100, 2, self.__font_special),
-        #     EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 100, 3, self.__font_special),
-        #     EnvironmentItem(self.__width // 4, ACTUAL_HEIGHT - 100, 4, self.__font_special)
-        # ]
-        #
         # scene_1_entities = [
         #     Door(WIDTH - 170,
         #          'door_var_1', 150, 270,
@@ -197,27 +317,20 @@ class Game:
         #     EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_special),
         #     EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_special)
         # ]
-        #
-        # scene_2_entities = [
-        #     Door(WIDTH - 170,
-        #          'door_var_1', 150, 270,
-        #          2, 0, 'scene1', 20, self.__font_special),
-        #     Door(20,
-        #          'door_var_2', 150, 270,
-        #          2, 1, 'scene2', 20,  self.__font_special),
-        #     EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_special),
-        #     EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_special)
-        # ]
-        #
-        # self.__scenes = [Scene(0, 'scene_1', scene_0_entities, self.__font_special),
-        #                  Scene(1, 'scene_2', scene_1_entities, self.__font_special),
-        #                  Scene(2, 'scene_3', scene_2_entities, self.__font_special)]
 
         # mansion - 0
         main_hall = [
             Door(WIDTH // 2 - 75,
                  'empty_door', 150, 270,
                  0, 1, 'Graveyard', WIDTH // 2,
+                 self.__font_special),
+            Door(200,
+                 'empty_door', 150, 270,
+                 0, 17, 'Stairway Passage', 150,
+                 self.__font_special),
+            Door(WIDTH - 400,
+                 'empty_door', 150, 270,
+                 0, 17, 'Stairway Passage', WIDTH - 520,
                  self.__font_special)
         ]
 
@@ -275,10 +388,6 @@ class Game:
                  'empty_door', 150, 270,
                  5, 4, 'the back of Large Gallery', 100,
                  self.__font_special),
-            Door(0,
-                 'empty_door', 150, 270,
-                 5, 8, 'Roofed Passage', WIDTH - 220,
-                 self.__font_special),
             Door(WIDTH // 2 + 150,
                  'empty_door', 150, 270,
                  5, 6, 'East Wing Stairway', WIDTH - 220,
@@ -291,10 +400,6 @@ class Game:
                  'empty_door', 150, 270,
                  6, 5, 'Dark Corridor', WIDTH // 2 + 150,
                  self.__font_special),
-            Door(WIDTH // 2,
-                 'empty_door', 150, 270,
-                 6, 7, 'East Wing Storeroom', 0,
-                 self.__font_special)
         ]
 
         # east_wing_storeroom - 7
@@ -323,7 +428,7 @@ class Game:
                  'empty_door', 150, 270,
                  9, 8, 'Roofed Passage', 200,
                  self.__font_special),
-            Door(WIDTH // 2 + 150,
+            Door(WIDTH // 2,
                  'empty_door', 150, 270,
                  9, 10, 'Main Garden', 0,
                  self.__font_special)
@@ -347,9 +452,9 @@ class Game:
                  'empty_door', 150, 270,
                  11, 10, 'Main Garden', WIDTH // 2 - 200,
                  self.__font_special),
-            Door(WIDTH // 2 - 200,
+            Door(0,
                  'empty_door', 150, 270,
-                 11, 12, 'the tunnel behind the Waterfall', 0,
+                 11, 20, 'Zigzag Passage', WIDTH - 220,
                  self.__font_special)
         ]
 
@@ -409,10 +514,134 @@ class Game:
                  self.__font_special)
         ]
 
+        # stairway_passage - 17
+        stairway_passage = [
+            Door(150,
+                 'empty_door', 150, 270,
+                 17, 0, 'Main Hall', 200,
+                 self.__font_special),
+            Door(WIDTH - 300,
+                 'empty_door', 150, 270,
+                 17, 0, 'Main Hall', WIDTH - 350,
+                 self.__font_special),
+        ]
+
+        # altar - 18
+        altar = [
+            Door(40,
+                 'empty_door', 150, 270,
+                 18, 17, 'Main Hall', WIDTH // 2 - 75,
+                 self.__font_special),
+            Door(WIDTH - 150,
+                 'empty_door', 150, 270,
+                 18, 19, 'Main Lab', 0,
+                 self.__font_special)
+        ]
+
+        # main_lab - 19
+        main_lab = [
+            Door(0,
+                 'empty_door', 150, 270,
+                 19, 18, 'Altar', WIDTH - 220,
+                 self.__font_special)
+        ]
+
+        # zigzag_start - 20
+        zigzag_start = [
+            Door(WIDTH - 200,
+                 'empty_door', 150, 270,
+                 20, 11, 'Falls Area', 0,
+                 self.__font_special),
+            Door(0,
+                 'empty_door', 150, 270,
+                 20, 21, 'the next part of passage', WIDTH - 220,
+                 self.__font_special)
+        ]
+
+        # zigzag_end - 21
+        zigzag_end = [
+            Door(WIDTH - 200,
+                 'empty_door', 150, 270,
+                 21, 20, 'the previous part of passage', 0,
+                 self.__font_special),
+            Door(300,
+                 'empty_door', 150, 270,
+                 21, 22, 'Guardhouse', WIDTH - 220,
+                 self.__font_special)
+        ]
+
+        # gh_entr_0 - 22
+        gh_entr_0 = [
+            Door(WIDTH - 150,
+                 'empty_door', 150, 270,
+                 22, 21, 'Zigzag Passage', 300,
+                 self.__font_special),
+            Door(WIDTH // 2,
+                 'empty_door', 150, 270,
+                 22, 23, 'Corridor', WIDTH - 220,
+                 self.__font_special)
+        ]
+
+        # gh_entr_1 - 23
+        gh_entr_1 = [
+            Door(WIDTH - 150,
+                 'empty_door', 150, 270,
+                 23, 22, 'Entrance', WIDTH // 2,
+                 self.__font_special),
+            Door(WIDTH - 500,
+                 'empty_door', 150, 270,
+                 23, 24, 'Break Room', WIDTH - 220,
+                 self.__font_special),
+            Door(350,
+                 'empty_door', 150, 270,
+                 23, 25, 'Main Corridor', 0,
+                 self.__font_special)
+        ]
+
+        # break_room - 24
+        break_room = [
+            Door(WIDTH - 150,
+                 'empty_door', 150, 270,
+                 24, 23, 'Break Room', WIDTH - 500,
+                 self.__font_special)
+        ]
+
+        # gh_corr_0 - 25 (Main Corridor)
+        gh_corr_0 = [
+            Door(100,
+                 'empty_door', 150, 270,
+                 25, 23, 'Corridor', 350,
+                 self.__font_special),
+            Door(WIDTH - 200,
+                 'empty_door', 150, 270,
+                 25, 26, 'the next part of Main Corridor', WIDTH - 220,
+                 self.__font_special)
+        ]
+
+        # gh_corr_1 - 26 (Main Corridor)
+        gh_corr_1 = [
+            Door(WIDTH - 150,
+                 'empty_door', 150, 270,
+                 26, 25, 'the previous part of Main Corridor', WIDTH - 220,
+                 self.__font_special),
+            Door(WIDTH - 500,
+                 'empty_door', 150, 270,
+                 26, 27, 'Gallery', 0,
+                 self.__font_special)
+        ]
+
+        # gh_gallery - 27
+        gh_gallery = [
+            Door(0,
+                 'empty_door', 150, 270,
+                 27, 26, 'Main Corridor', WIDTH - 500,
+                 self.__font_special)
+        ]
+
         self.__scenes = [Scene(0, 'main_hall', main_hall,
-                               self.__font_special),
+                               self.__font_special, 100, 100),
                          Scene(1, 'graveyard_top', graveyard_top,
-                               self.__font_special),
+                               self.__font_special, 490),
                          Scene(2, 'graveyard_bottom', graveyard_bottom,
                                self.__font_special),
                          Scene(3, 'large_gallery_front', large_gallery_front,
@@ -424,11 +653,11 @@ class Game:
                          Scene(6, 'east_wing_stairway', east_wing_stairway,
                                self.__font_special),
                          Scene(7, 'east_wing_storeroom', east_wing_storeroom,
-                               self.__font_special),
+                               self.__font_special, 0, 490),
                          Scene(8, 'roofed_passage', roofed_passage,
-                               self.__font_special),
+                               self.__font_special, 200),
                          Scene(9, 'garden_shed', garden_shed,
-                               self.__font_special),
+                               self.__font_special, 0, 420),
                          Scene(10, 'main_garden', main_garden,
                                self.__font_special),
                          Scene(11, 'falls_area', falls_area,
@@ -442,6 +671,28 @@ class Game:
                          Scene(15, 'generator_room', generator_room,
                                self.__font_special),
                          Scene(16, 'enrico_room', enrico_room,
+                               self.__font_special),
+                         Scene(17, 'stairway_passage', stairway_passage,
+                               self.__font_special, 140, 140),
+                         Scene(18, 'altar', altar,
+                               self.__font_special, 40),
+                         Scene(19, 'main_lab', main_lab,
+                               self.__font_special, 0, 150),
+                         Scene(20, 'zigzag_start', zigzag_start,
+                               self.__font_special),
+                         Scene(21, 'zigzag_end', zigzag_end,
+                               self.__font_special, 300),
+                         Scene(22, 'gh_entr_0', gh_entr_0,
+                               self.__font_special, 50),
+                         Scene(23, 'gh_entr_1', gh_entr_1,
+                               self.__font_special, 300),
+                         Scene(24, 'break_room', break_room,
+                               self.__font_special, 120),
+                         Scene(25, 'gh_corr_0', gh_corr_0,
+                               self.__font_special),
+                         Scene(26, 'gh_corr_1', gh_corr_1,
+                               self.__font_special, 300),
+                         Scene(27, 'gh_gallery', gh_gallery,
                                self.__font_special),
                          ]
 

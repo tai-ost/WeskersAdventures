@@ -104,16 +104,16 @@ class Wesker:
     def get_last_direction(self):
         return self.__last_direction
 
-    def check_wesker_logic(self):
-        self.__check_wall_collision()
+    def check_wesker_logic(self, scene):
+        self.__check_wall_collision(scene)
         self.__check_wesker_state()
 
-    def __check_wall_collision(self):
-        if self.__rect.x < 0:
-            self.__rect.x = 0
+    def __check_wall_collision(self, scene):
+        if self.__rect.x < scene.get_left_wall():
+            self.__rect.x = scene.get_left_wall()
             self.__x_velocity = 0
-        elif self.__rect.x > WIDTH - self.__rect.width:
-            self.__rect.x = WIDTH - self.__rect.width
+        elif self.__rect.x > WIDTH - self.__rect.width - scene.get_right_wall():
+            self.__rect.x = WIDTH - self.__rect.width - scene.get_right_wall()
             self.__x_velocity = 0
         if self.__rect.y < 0:
             self.__rect.y = 0
@@ -231,7 +231,20 @@ class Wesker:
         self.__rect.x = new_x
         self.__update_hitbox_rect()
 
-    def get_hitbox_rect(self):  # ;)
+    def change_x_velocity(self, new_v):
+        self.__x_velocity = new_v
+
+    def change_y_position(self, new_y):
+        self.__rect.y = new_y
+        self.__update_hitbox_rect()
+
+    def change_y_velocity(self, new_v):
+        self.__y_velocity = new_v
+
+    def change_state(self, state):
+        self.__state = state
+
+    def get_hitbox_rect(self):
         return self.__hitbox_rect
 
     def __update_hitbox_rect(self):
@@ -239,5 +252,4 @@ class Wesker:
         self.__hitbox_rect.y = self.__rect.y
 
     def draw_wesker(self, screen):
-        # self.__check_wesker_state()
         screen.blit(self.__load_wesker_image(self.__state), self.__rect)

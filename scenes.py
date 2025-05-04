@@ -7,16 +7,39 @@ from hud import HUD
 
 
 class Scene:
-    def __init__(self, scene_id, background_image, entities, font):
+    def __init__(self, scene_id, background_image, entities, font,
+                 left_wall_width=0, right_wall_width=0, overlay_image=None):
         self.__scene_id = scene_id
         self.__background_image = pygame.transform.scale(
             pygame.image.load(f'images/background_img/{background_image}.png').convert_alpha(),
             (WIDTH, ACTUAL_HEIGHT),
         )
+
+        if overlay_image:
+            self.__overlay_image = pygame.transform.scale(
+                pygame.image.load(f'images/background_img/{overlay_image}.png').convert_alpha(),
+                (WIDTH, ACTUAL_HEIGHT),
+            )
+
+        self.__left_wall_width = left_wall_width
+        self.__right_wall_width = right_wall_width
+
         self.__background_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
-        self.__entities = entities
+        self.__entities: list = entities
 
         self.__font = font
+
+    def get_left_wall(self):
+        return self.__left_wall_width
+
+    def get_right_wall(self):
+        return self.__right_wall_width
+
+    def add_entity(self, entity):
+        self.__entities.append(entity)
+
+    def delete_last_entity(self):
+        self.__entities.pop()
 
     def get_entities(self):
         return self.__entities
@@ -37,12 +60,16 @@ class Scene:
         entity: Door | Enemy | EnvironmentItem
         for entity in self.__entities:
             entity.check_entity_logic(wesker, hud)
-
+            if entity.entity_type == 'enemy' and entity.get_name() == 'lisa_trevor' and not entity.is_alive():
+                hud.update_lisa_state(False)
         wesker.have_fired = False
 
     def draw(self, screen, wesker: Wesker):
         self.__draw_background(screen)
         self.__draw_entities(screen, wesker)
+
+    def draw_for_script(self, screen):
+        self.__draw_background(screen)
 
     def __draw_background(self, screen):
         screen.blit(self.__background_image, self.__background_rect)
@@ -80,6 +107,12 @@ class Enemy:
 
     def get_x(self):
         return self.__rect.x
+
+    def get_name(self):
+        return self.__name
+
+    def is_alive(self):
+        return self.__alive
 
     def __get_damage(self):
         self.__health -= 1

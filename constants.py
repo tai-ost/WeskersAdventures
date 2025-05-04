@@ -17,7 +17,7 @@ ENEMY_TYPES = (
     ('adder', 1, 1, 5, True, 100, 20),
     ('hunter', 5, 40, 2, True, 200, 200),
     ('chimera', 2, 10, 5, False, 100, 200),
-    ('lisa_trevor', 20, 20, 1, False, 150, 200)
+    ('lisa_trevor', 20, 40, 1, False, 200, 200)
 )
 
 # item_name, env_width, env_height, in_game_name

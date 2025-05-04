@@ -90,7 +90,8 @@ class HUD:
         self.__defensive_item_box_rect = pygame.Rect(480, 0, 80, 80)
 
         self.__item_name_color = pygame.Color(200, 200, 200)
-        ...
+
+        self.__lisa = True
 
     def hide_or_show(self):
         self.__hidden = not self.__hidden
@@ -245,6 +246,12 @@ class HUD:
 
     def update_time(self, time_passed):
         self.__timer = time_passed
+
+    def update_lisa_state(self, state):
+        self.__lisa = state
+
+    def check_lisa_state(self):
+        return self.__lisa
 
     def update_ammo(self, ammo):
         self.__ammo_loaded = ammo
