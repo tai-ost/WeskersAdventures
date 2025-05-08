@@ -5,22 +5,26 @@ from scenes import Scene
 from wesker import Wesker
 
 
+CHAR_IMG_WIDTH = 220
+CHAR_IMG_HEIGHT = 250
+
+
 def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: pygame.time.Clock):
     font = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
     line_color = pygame.Color(250, 250, 250)
     lines = [
         'There are only three S.T.A.R.S. members left now.',  # 0
-        'Jill, Chris, and myself.',  # 1
+        'Chris, Jill, and myself.',  # 1
         'Jill: Is everyone alright?',  # 2
         'Chris: Barry? Where\'s Barry?',  # 3
         'Wesker: He\'s..',  # 4
         'Jill: No...',  # 5
         '*sound of a gunshot*',  # everyone is turning to the left - 6
         'Jill: What was that?',  # 7
-        'Chris: I\'ll go and check it out.',  # 8
+        'Chris: I\'ll go and check it out.',  # Chris moves a bit to the left - 8
         'Wesker: Alright.',  # 9
-        'Wesker: Jill and I will stay and secure this area.',  # Chris moves even more left - 10
-        'Jill: Chris...',  # 11
+        'Wesker: Jill and I will stay and secure this area.',  # Chris moves even more to the left - 10
+        'Jill: Chris...',  # Chris turns to Jill - 11
         'Jill: Take care.',  # 12
         'Chris: Yeah.',  # 13
         # Chris disappears
@@ -52,6 +56,18 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock
     wesker.change_y_position(ACTUAL_HEIGHT - wesker.get_hitbox_rect().height)
     wesker.change_state('wesker_idle_left')
 
+    chris_img = pygame.transform.scale(
+            pygame.image.load(f'images/character_img/chris_idle_right.png').convert_alpha(),
+            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+        )
+    chris_rect = pygame.Rect(300, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
+
+    jill_img = pygame.transform.scale(
+            pygame.image.load(f'images/character_img/jill_idle_right.png').convert_alpha(),
+            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+        )
+    jill_rect = pygame.Rect(WIDTH // 2 - 100, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
+
     script_running = True
     while script_running:
         for event in pygame.event.get():
@@ -66,17 +82,42 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock
                     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
                     if next_line == 6:
-                        ...
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_idle_left.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
+                        jill_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/jill_idle_left.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
+                    elif next_line == 8:
+                        chris_rect.x -= 70
                     elif next_line == 10:
-                        ...
-                    elif next_line == 13:
-                        ...
+                        chris_rect.x -= 70
+                    elif next_line == 11:
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_idle_right.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
+                    elif next_line == 14:
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
                     elif next_line == 15:
                         wesker.change_x_position(WIDTH - 300)
+                        jill_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/jill_idle_right.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
                     elif next_line == 16:
-                        ...
+                        jill_rect.x = wesker.get_hitbox_rect().x - 200
                     elif next_line == 20:
                         wesker.change_x_position(1280)
+                        jill_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
                     elif next_line == 21:
                         wesker.change_x_position(WIDTH - 300)
 
@@ -84,7 +125,11 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock
                     return 2
 
         scene.draw_for_script(screen)
+
         wesker.draw_wesker(screen)
+        screen.blit(chris_img, chris_rect)
+        screen.blit(jill_img, jill_rect)
+
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         if next_line == 20:
@@ -302,6 +347,12 @@ def script_gh_corr(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: 
     wesker.change_y_position(ACTUAL_HEIGHT - wesker.get_hitbox_rect().height)
     wesker.change_state('wesker_idle_right')
 
+    chris_img = pygame.transform.scale(
+        pygame.image.load(f'images/character_img/chris_idle_left.png').convert_alpha(),
+        (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+    )
+    chris_rect = pygame.Rect(WIDTH - 300, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
+
     script_running = True
     while script_running:
         for event in pygame.event.get():
@@ -317,21 +368,30 @@ def script_gh_corr(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: 
 
                     if next_line == 4:
                         wesker.change_x_position(WIDTH // 2 + 100)
-                        ...
+                        chris_rect.x = WIDTH // 2 + 50
                     elif next_line == 5:
                         wesker.change_x_position(WIDTH // 2 + 200)
-                        ...
+                        chris_rect.x = WIDTH // 2
                     elif next_line == 6:
                         wesker.change_state('wesker_idle_left')
-                        ...
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_idle_right.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
                     elif next_line == 16:
-                        ...
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
 
                 else:
                     return 6
 
         scene.draw_for_script(screen)
+
         wesker.draw_wesker(screen)
+        screen.blit(chris_img, chris_rect)
+
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         screen.blit(line_surface, line_rect)
@@ -399,9 +459,9 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
         'But Chris hasn\'t been here yet.',  # 1
         'I need to be careful.',  # 2
         '...',  # 3 - Wesker hides, Chris appears
-        '',  # 4 - Chris moves towards the Enrico Room
-        '',  # 5 - Chris moves towards the Enrico Room
-        '',  # 6 - Chris disappears
+        '...',  # 4 - Chris moves towards the Enrico Room
+        '...',  # 5 - Chris moves towards the Enrico Room
+        '...',  # 6 - Chris disappears
         'I need to follow him.',  # 7 - Wesker is not hiding anymore
     ]
     next_line = 0
@@ -416,9 +476,15 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
-    wesker.change_x_position(400)
+    wesker.change_x_position(150)
     wesker.change_y_position(ACTUAL_HEIGHT - wesker.get_hitbox_rect().height)
     wesker.change_state('wesker_idle_right')
+
+    chris_img = pygame.transform.scale(
+        pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+        (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+    )
+    chris_rect = pygame.Rect(150, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
 
     script_running = True
     while script_running:
@@ -435,20 +501,32 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
 
                     if next_line == 3:
                         wesker.change_x_position(350)
-                        # wesker.change_state('wesker_hiding')
+                        wesker.change_state('wesker_hiding')
                     elif next_line == 4:
-                        ...
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_idle_right.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
                     elif next_line == 5:
-                        ...
+                        chris_rect.x = 700
+                    elif next_line == 6:
+                        chris_rect.x = WIDTH - 300
                     elif next_line == 7:
                         wesker.change_x_position(WIDTH // 2)
                         wesker.change_state('wesker_idle_right')
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
 
                 else:
                     return 8
 
         scene.draw_for_script(screen)
+
         wesker.draw_wesker(screen)
+        screen.blit(chris_img, chris_rect)
+
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         if next_line == 3:
@@ -475,7 +553,7 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
         'Enrico: Umbrella...',  # 8
         '',  # 9 - Enrico dies
         'Chris: A double-crosser?',  # 10
-        '',  # 11 - Chris turns towards Wesker
+        '',  # 11
         'I need to get out of here, quick.',  # 12
         '...'  # 13
     ]
@@ -493,7 +571,12 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
     wesker.change_y_velocity(0)
     wesker.change_y_position(ACTUAL_HEIGHT - wesker.get_hitbox_rect().height)
     wesker.change_state('wesker_idle_right')
-    # wesker.change_state('wesker_coming')
+
+    chris_img = pygame.transform.scale(
+        pygame.image.load(f'images/character_img/chris_enrico_alive.png').convert_alpha(),
+        (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+    )
+    chris_rect = pygame.Rect(WIDTH - 350, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
 
     script_running = True
     while script_running:
@@ -521,19 +604,25 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
                     elif next_line == 6:
                         wesker.change_state('wesker_firing_right')
                     elif next_line == 7:
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_enrico_dead.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
                         wesker.change_x_position(400)
                         wesker.change_state('wesker_running_left_frame_0')
                     elif next_line == 8:
                         wesker.change_x_position(200)
                         wesker.change_state('wesker_running_left_frame_1')
                     elif next_line == 9:
-                        ...
-                        # wesker.change_state('wesker_coming')
+                        wesker.change_state('wesker_idle_left')
                 else:
                     return 9
 
         scene.draw_for_script(screen)
+
         wesker.draw_wesker(screen)
+        screen.blit(chris_img, chris_rect)
+
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         if next_line == 13:
@@ -565,19 +654,23 @@ def script_altar(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: py
     floor_color = (10, 10, 10)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
-    lisa_rect = pygame.Rect(WIDTH - 300, ACTUAL_HEIGHT - 200, 200, 200)
-    lisa_img = image = pygame.transform.scale(
-                pygame.image.load(
-                    f'images/entity_img/enemy_img/lisa_trevor_1_0.png'
-                ).convert_alpha(),
-                (200, 200),
-            )
-
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
     wesker.change_x_position(300)
     wesker.change_y_position(ACTUAL_HEIGHT - wesker.get_hitbox_rect().height)
     wesker.change_state('wesker_idle_right')
+
+    chris_img = pygame.transform.scale(
+        pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+        (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+    )
+    chris_rect = pygame.Rect(50, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
+
+    lisa_img = pygame.transform.scale(
+        pygame.image.load(f'images/entity_img/enemy_img/lisa_trevor_1_0.png').convert_alpha(),
+        (200, 200),
+    )
+    lisa_rect = pygame.Rect(WIDTH - 300, ACTUAL_HEIGHT - 200, 200, 200)
 
     script_running = True
     while script_running:
@@ -594,13 +687,21 @@ def script_altar(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: py
 
                     if next_line == 1:
                         wesker.change_state('wesker_aiming_right')
+                    elif next_line == 3:
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_idle_right.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
 
                 else:
                     return 10
 
         scene.draw_for_script(screen)
+
         wesker.draw_wesker(screen)
         screen.blit(lisa_img, lisa_rect)
+        screen.blit(chris_img, chris_rect)
+
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         if next_line == 0:
@@ -636,6 +737,12 @@ def script_altar_after_fight(scene: Scene, wesker: Wesker, screen: pygame.Surfac
     wesker.change_y_position(ACTUAL_HEIGHT - wesker.get_hitbox_rect().height)
     wesker.change_state('wesker_idle_right')
 
+    chris_img = pygame.transform.scale(
+        pygame.image.load(f'images/character_img/chris_idle_left.png').convert_alpha(),
+        (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+    )
+    chris_rect = pygame.Rect(WIDTH - 500, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
+
     script_running = True
     while script_running:
         for event in pygame.event.get():
@@ -649,18 +756,21 @@ def script_altar_after_fight(scene: Scene, wesker: Wesker, screen: pygame.Surfac
                     line_rect.x = WIDTH // 2 - line_rect.width // 2
                     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-                    if next_line == 1:
-                        ...
+                    if next_line == 2:
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
 
                 else:
                     return 11
 
         scene.draw_for_script(screen)
-        wesker.draw_wesker(screen)
-        pygame.draw.rect(screen, floor_color, floor_rect)
 
-        if next_line == 2:
-            pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
+        wesker.draw_wesker(screen)
+        screen.blit(chris_img, chris_rect)
+
+        pygame.draw.rect(screen, floor_color, floor_rect)
 
         screen.blit(line_surface, line_rect)
 
@@ -680,7 +790,7 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
         '...',  # 5 - Chris and Rebecca enter the scene
         'Chris: Wesker.',  # 6
         'Wesker: So you\'ve come.',  # 7
-        'Wesker: Chris, you make me proud',  # 8
+        'Wesker: Chris, you make me proud.',  # 8
         'Wesker: But of course, you are one of my men.',  # 9
         'Chris: Thanks.',  # 10
         '...',  # 11 - Wesker points the gun at Chris
@@ -713,9 +823,9 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
         'Wesker: Chris, you\'ll never understand.',  # 36 - Wesker goes to Tyrant's capsule and stands in front of it
         'Wesker: It\'s magnificent.',  # 37
         '...',  # 38 - Tyrant breaks the capsule and impales Wesker's chest with his claw
-        'Chris: Wesker...',  # 39
+        'Chris: Wesker!',  # 39
         '...',  # 40 - Wesker POV being impaled
-        '...',  # 41 - Wesker POV on the ground (Tyrant is now looking towards Chris)
+        '...',  # 41 - screen gets darker
         '...',  # 42 - black screen
         'The End?',  # 43
     ]
@@ -735,6 +845,34 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
     wesker.change_y_position(ACTUAL_HEIGHT - wesker.get_hitbox_rect().height)
     wesker.change_state('wesker_idle_right')
 
+    chris_img = pygame.transform.scale(
+        pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+        (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+    )
+    chris_rect = pygame.Rect(400, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
+
+    rebecca_img = pygame.transform.scale(
+        pygame.image.load(f'images/character_img/empty.png').convert_alpha(),
+        (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+    )
+    rebecca_rect = pygame.Rect(300, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
+
+    tyrant_img = pygame.transform.scale(
+        pygame.image.load(f'images/character_img/tyr_empty.png').convert_alpha(),
+        (220, 300),
+    )
+    tyrant_rect = pygame.Rect(WIDTH - 350, ACTUAL_HEIGHT - 300, 220, 300)
+
+    impaled_img = pygame.transform.scale(
+            pygame.image.load(f'images/background_img/im_sorry_wesker.png').convert_alpha(),
+            (1280, 720),
+        )
+    impaled_rect = pygame.Rect(0, 0, 1280, 720)
+
+    dark_surface = pygame.Surface((1280, 720))
+    dark_surface.fill((0, 0, 0))
+    dark_surface.set_alpha(128)
+
     script_running = True
     while script_running:
         for event in pygame.event.get():
@@ -748,44 +886,79 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
                     line_rect.x = WIDTH // 2 - line_rect.width // 2
                     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-                    if next_line == 3:
-                        ...
-                        # wesker.change_state('wesker_injecting')
-                    elif next_line == 4:
+                    if next_line == 4:
                         wesker.change_x_position(WIDTH - 600)
-                        # wesker.change_state('wesker_control')
+                        wesker.change_state('wesker_control_down')
+                    elif next_line == 5:
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_idle_right.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
+
+                        rebecca_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/rebecca_idle_right.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
+
                     elif next_line == 11:
-                        ...
-                        # wesker.change_state('wesker_control_aiming')
+                        wesker.change_state('wesker_control_aiming')
                     elif next_line == 26:
-                        ...
-                        # wesker.change_state('wesker_control_firing')
+                        wesker.change_state('wesker_control_firing')
                     elif next_line == 27:
-                        ...
-                        # wesker.change_state('wesker_control_aiming')
+                        rebecca_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/rebecca_lying.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_looking_down.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
+                        wesker.change_state('wesker_control_aiming')
+                    elif next_line == 29:
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_idle_right.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
                     elif next_line == 32:
+                        wesker.change_x_position(WIDTH - 380)
+                        chris_rect.x += 200
+                        wesker.change_state('wesker_looking_up')
+                    elif next_line == 37:
                         wesker.change_x_position(WIDTH - 350)
-                        # move Chris closer and lower the fluid level in capsule
-                        # wesker.change_state('wesker_looking_up')
                     elif next_line == 38:
-                        wesker.change_y_position(ACTUAL_HEIGHT - 400)
-                        # wesker.change_state('wesker_impaled')
+                        wesker.change_x_position(WIDTH - 380)
+                        wesker.change_y_position(ACTUAL_HEIGHT - 300)
+                        chris_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/chris_looking_up.png').convert_alpha(),
+                            (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
+                        )
+                        tyrant_img = pygame.transform.scale(
+                            pygame.image.load(f'images/character_img/tyrant.png').convert_alpha(),
+                            (220, 300),
+                        )
+                        wesker.change_state('wesker_impaled')
 
                 else:
                     return 12
 
         scene.draw_for_script(screen)
+
+        screen.blit(tyrant_img, tyrant_rect)
         wesker.draw_wesker(screen)
+        screen.blit(chris_img, chris_rect)
+        screen.blit(rebecca_img, rebecca_rect)
+
         pygame.draw.rect(screen, floor_color, floor_rect)
 
-        if (next_line == 0) or (next_line == 1) or (next_line == 42) or (next_line == 43):
+        if (next_line == 0) or (next_line == 1) or (next_line == 3) or(next_line == 42) or (next_line == 43):
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
+        elif next_line == 39:
+            screen.blit(dark_surface, impaled_rect)
         elif next_line == 40:
-            ...
-            # screen.blit(impaled_img, impaled_rect)
+            screen.blit(impaled_img, impaled_rect)
         elif next_line == 41:
-            ...
-            # screen.blit(on_ground_img, on_ground_rect)
+            screen.blit(impaled_img, impaled_rect)
+            screen.blit(dark_surface, impaled_rect)
 
         screen.blit(line_surface, line_rect)
 
