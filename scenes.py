@@ -8,23 +8,24 @@ from hud import HUD
 
 class Scene:
     def __init__(self, scene_id, background_image, entities, font,
-                 left_wall_width=0, right_wall_width=0, overlay_image=None):
+                 left_wall_width=0, right_wall_width=0, overlay_image=False):
         self.__scene_id = scene_id
         self.__background_image = pygame.transform.scale(
             pygame.image.load(f'images/background_img/{background_image}.png').convert_alpha(),
             (WIDTH, ACTUAL_HEIGHT),
         )
 
-        if overlay_image:
+        self.__overlay = overlay_image
+        if self.__overlay:
             self.__overlay_image = pygame.transform.scale(
-                pygame.image.load(f'images/background_img/{overlay_image}.png').convert_alpha(),
+                pygame.image.load(f'images/background_img/{background_image}_overlay.png').convert_alpha(),
                 (WIDTH, ACTUAL_HEIGHT),
             )
 
         self.__left_wall_width = left_wall_width
         self.__right_wall_width = right_wall_width
 
-        self.__background_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
+        self.__background_rect = pygame.Rect(0, 0, WIDTH, ACTUAL_HEIGHT)
         self.__entities: list = entities
 
         self.__font = font
@@ -67,6 +68,10 @@ class Scene:
     def draw(self, screen, wesker: Wesker):
         self.__draw_background(screen)
         self.__draw_entities(screen, wesker)
+
+    def draw_overlay(self, screen):
+        if self.__overlay:
+            screen.blit(self.__overlay_image, self.__background_rect)
 
     def draw_for_script(self, screen):
         self.__draw_background(screen)

@@ -12,11 +12,9 @@ DEFAULT_AMMO_STORED = 30
 # (name, health, dmg, velocity, is_poisonous, width, height)
 ENEMY_TYPES = (
     ('zombie', 3, 25, 2, False, 100, 200),
-    ('crimson_head', 3, 25, 3, False, 100, 200),
-    ('cerberus', 2, 10, 5, False, 100, 50),
+    ('cerberus', 2, 10, 5, False, 200, 100),
     ('adder', 1, 1, 5, True, 100, 20),
-    ('hunter', 5, 40, 2, True, 200, 200),
-    ('chimera', 2, 10, 5, False, 100, 200),
+    ('hunter', 5, 40, 2, True, 250, 250),
     ('lisa_trevor', 20, 40, 1, False, 200, 200)
 )
 
@@ -27,7 +25,7 @@ ITEM_TYPES = (
     ('green_herb', 70, 100, 'Green Herb'),              # 2
     ('red_herb', 70, 100, 'Red Herb'),                  # 3
     ('blue_herb', 70, 100, 'Blue Herb'),                # 4
-    ('dagger', 50, 50, 'Dagger'),                      # 5
+    ('dagger', 70, 20, 'Dagger'),                      # 5
     ('handgun_ammo', 50, 50, 'Handgun Ammo'),          # 6
     ('mixed_g_r', 50, 50, 'Mixed Herbs (G + R)'),      # 7
     ('mixed_g_b', 50, 50, 'Mixed Herbs (G + B)'),      # 8

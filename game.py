@@ -215,7 +215,7 @@ class Game:
             self.__scenes[15].delete_last_entity()
             self.__current_scene = 15
             self.__wesker.change_x_position(WIDTH - 220)
-            self.__scenes[18].add_entity(Enemy(WIDTH - 300, 6))
+            self.__scenes[18].add_entity(Enemy(WIDTH - 300, 4))
             self.__scenes[17].add_entity(Door(WIDTH // 2 - 75, 'empty_door',
                                               150, 270,
                                               17, 18, 'Altar', 40,
@@ -253,6 +253,7 @@ class Game:
     def __draw(self):
         self.__draw_scene()
         self.__draw_characters()
+        self.__draw_overlay()
         self.__draw_hud()
         self.__draw_darkness()
 
@@ -263,7 +264,7 @@ class Game:
         self.__scenes[self.__current_scene].draw(self.__screen, self.__wesker)
 
     def __draw_floor(self):
-        floor_color = (10, 10, 10)
+        floor_color = (0, 0, 0)
         floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
         pygame.draw.rect(self.__screen, floor_color, floor_rect)
 
@@ -277,6 +278,9 @@ class Game:
 
     def __draw_characters(self):
         self.__wesker.draw_wesker(self.__screen)
+
+    def __draw_overlay(self):
+        self.__scenes[self.__current_scene].draw_overlay(self.__screen)
 
     def __draw_hud(self):
         self.__hud.draw_hud(self.__screen)
@@ -352,7 +356,7 @@ class Game:
                  'empty_door', 150, 270,
                  2, 1, 'the upstairs of Graveyard', WIDTH - 220,
                  self.__font_special),
-            Door(200,
+            Door(300,
                  'empty_door', 150, 270,
                  2, 3, 'Large Gallery', 0,
                  self.__font_special)
@@ -641,13 +645,13 @@ class Game:
         self.__scenes = [Scene(0, 'main_hall', main_hall,
                                self.__font_special, 100, 100),
                          Scene(1, 'graveyard_top', graveyard_top,
-                               self.__font_special, 490),
+                               self.__font_special, 490, overlay_image=True),
                          Scene(2, 'graveyard_bottom', graveyard_bottom,
                                self.__font_special),
                          Scene(3, 'large_gallery_front', large_gallery_front,
                                self.__font_special),
                          Scene(4, 'large_gallery_back', large_gallery_back,
-                               self.__font_special),
+                               self.__font_special, overlay_image=True),
                          Scene(5, 'dark_corridor', dark_corridor,
                                self.__font_special),
                          Scene(6, 'east_wing_stairway', east_wing_stairway,

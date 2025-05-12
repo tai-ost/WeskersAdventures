@@ -47,7 +47,7 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock
     line_rect.x = WIDTH // 2 - line_rect.width // 2
     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-    floor_color = (10, 10, 10)
+    floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     wesker.change_x_velocity(0)
@@ -159,7 +159,7 @@ def script_east_wing_stairway(scene: Scene, wesker: Wesker, screen: pygame.Surfa
     line_rect.x = WIDTH // 2 - line_rect.width // 2
     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-    floor_color = (10, 10, 10)
+    floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     wesker.change_x_velocity(0)
@@ -338,7 +338,7 @@ def script_gh_corr(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: 
     line_rect.x = WIDTH // 2 - line_rect.width // 2
     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-    floor_color = (10, 10, 10)
+    floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     wesker.change_x_velocity(0)
@@ -471,7 +471,7 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
     line_rect.x = WIDTH // 2 - line_rect.width // 2
     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-    floor_color = (10, 10, 10)
+    floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     wesker.change_x_velocity(0)
@@ -564,7 +564,7 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
     line_rect.x = WIDTH // 2 - line_rect.width // 2
     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-    floor_color = (10, 10, 10)
+    floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     wesker.change_x_velocity(0)
@@ -729,7 +729,7 @@ def script_altar_after_fight(scene: Scene, wesker: Wesker, screen: pygame.Surfac
     line_rect.x = WIDTH // 2 - line_rect.width // 2
     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-    floor_color = (10, 10, 10)
+    floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     wesker.change_x_velocity(0)
@@ -836,7 +836,7 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
     line_rect.x = WIDTH // 2 - line_rect.width // 2
     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
-    floor_color = (10, 10, 10)
+    floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     wesker.change_x_velocity(0)
