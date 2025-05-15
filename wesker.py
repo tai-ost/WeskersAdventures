@@ -72,6 +72,8 @@ class Wesker:
         self.__firing_delay = 0
         self.have_fired = False
 
+        self.__kitty = False
+
     def get_movement_keys(self):
         return self.__direction.keys()
 
@@ -169,8 +171,9 @@ class Wesker:
         self.__update_hitbox_rect()
 
     def __load_wesker_image(self, image_path):
+        kitty = '_kitty' if self.__kitty else ''
         image = pygame.transform.scale(
-            pygame.image.load(f'images/wesker_img/{image_path}.png').convert_alpha(),
+            pygame.image.load(f'images/wesker_img/{image_path + kitty}.png').convert_alpha(),
             (self.__image_width, self.__image_height),
         )
         return image
@@ -190,7 +193,8 @@ class Wesker:
             if self.__firing and (self.__firing_delay == 0) and (self.__ammo > 0):
                 self.__firing_delay = pygame.time.get_ticks() + 500
                 self.have_fired = True
-                self.__ammo = max(0, self.__ammo - 1)
+                if not self.__kitty:
+                    self.__ammo = max(0, self.__ammo - 1)
                 self.__state = self.__possible_states[12 + self.__last_direction]
             else:
                 self.__state = self.__possible_states[10 + self.__last_direction]
@@ -243,6 +247,9 @@ class Wesker:
 
     def change_state(self, state):
         self.__state = state
+
+    def kitty(self):
+        self.__kitty = not self.__kitty
 
     def get_hitbox_rect(self):
         return self.__hitbox_rect

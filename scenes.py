@@ -25,7 +25,7 @@ class Scene:
         self.__left_wall_width = left_wall_width
         self.__right_wall_width = right_wall_width
 
-        self.__background_rect = pygame.Rect(0, 0, WIDTH, ACTUAL_HEIGHT)
+        self.__background_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
         self.__entities: list = entities
 
         self.__font = font
@@ -46,7 +46,7 @@ class Scene:
         return self.__entities
 
     def check_scene_event(self, wesker: Wesker, hud: HUD, event_key):
-        entity: Door | Enemy | EnvironmentItem
+        entity: Door | Enemy | EnvironmentItem | ItemBox | Kitty
         for entity in self.__entities:
             if entity.entity_type == 'door' and entity.scene_change_allowed() and event_key == pygame.K_f:
                 wesker.change_x_position(entity.go_to_x_coords)
@@ -55,6 +55,12 @@ class Scene:
                     (hud.inventory_empty_slot() != 5) and event_key == pygame.K_t:
                 entity.get_taken()
                 hud.add_item(entity.get_item_type(), hud.inventory_empty_slot())
+            elif entity.entity_type == 'kitty' and entity.kitty_power() and event_key == pygame.K_t:
+                entity.kitty_change_state()
+                wesker.kitty()
+            elif entity.entity_type == 'item_box' and entity.box_active() and event_key == pygame.K_t:
+                entity.get_opened()
+                self.add_entity(Kitty(self.__font))
         return 0, 0
 
     def check_scene_logic(self, wesker: Wesker, hud: HUD):
@@ -295,6 +301,124 @@ class Door:
     def __load_image(self):
         image = pygame.transform.scale(
             pygame.image.load(f'images/entity_img/door_img/{self.__image_source}.png').convert_alpha(),
+            (self.__image_width, self.__image_height),
+        )
+        return image
+
+    def draw_entity(self, screen, _):
+        screen.blit(self.__load_image(), self.__rect)
+        if self.__action:
+            self.__show_prompt(screen)
+
+
+class ItemBox:
+    def __init__(self, font: pygame.font.Font):
+        self.entity_type = 'item_box'
+
+        self.__prompt_color = pygame.Color(250, 250, 250)
+        self.__prompt_text = f'Open the Item Box'
+        self.__opened = False
+
+        self.__box_size = 180
+
+        self.__rect = pygame.Rect(620, ACTUAL_HEIGHT - self.__box_size, self.__box_size, self.__box_size)
+
+        self.__font = font
+        self.__action = False
+
+    def box_active(self):
+        return self.__action
+
+    def get_opened(self):
+        self.__opened = True
+        self.__action = False
+
+    def check_entity_logic(self, wesker: Wesker, _):
+        self.__check_box_collision(wesker)
+
+    def __check_box_collision(self, wesker: Wesker):
+        if self.__rect.colliderect(wesker.get_hitbox_rect()):
+            self.__action = True
+        else:
+            self.__action = False
+
+    def __show_prompt(self, screen):
+        prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
+        prompt_rect: pygame.Rect = prompt_surface.get_rect()
+        prompt_rect.x = WIDTH // 2 - prompt_rect.width // 2
+        prompt_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - prompt_rect.height // 2
+
+        button_rect = pygame.Rect(prompt_rect.x - 60, ACTUAL_HEIGHT + 15, 40, 40)
+        button_image = pygame.transform.scale(
+            pygame.image.load(f'images/entity_img/env_item_img/key_t.png').convert_alpha(),
+            (40, 40),
+        )
+
+        screen.blit(button_image, button_rect)
+        screen.blit(prompt_surface, prompt_rect)
+
+    def draw_entity(self, screen, _):
+        if self.__action and not self.__opened:
+            self.__show_prompt(screen)
+
+
+class Kitty:
+    def __init__(self, font: pygame.font.Font):
+        self.entity_type = 'kitty'
+
+        self.__image_source = 'kitty'
+        self.__image_width = 150
+        self.__image_height = 150
+
+        self.__prompt_color = pygame.Color(30, 90, 220)
+        self.__prompt_text = f'Accept Kitty\'s power!'
+        self.__state = False
+
+        self.__rect = pygame.Rect(630, 350, self.__image_width, self.__image_height)
+
+        self.__font = font
+        self.__action = False
+
+    def kitty_power(self):
+        return self.__action
+
+    def kitty_change_state(self):
+        if not self.__state:
+            self.__prompt_color = pygame.Color(160, 20, 20)
+            self.__prompt_text = f'Return Kitty\'s power!'
+            self.__state = True
+        else:
+            self.__prompt_color = pygame.Color(30, 90, 220)
+            self.__prompt_text = f'Accept Kitty\'s power!'
+            self.__state = False
+
+    def check_entity_logic(self, wesker: Wesker, _):
+        self.__check_kitty_collision(wesker)
+
+    def __check_kitty_collision(self, wesker: Wesker):
+        if self.__rect.colliderect(wesker.get_hitbox_rect()):
+            self.__action = True
+        else:
+            self.__action = False
+
+    def __show_prompt(self, screen):
+        prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
+        prompt_rect: pygame.Rect = prompt_surface.get_rect()
+        prompt_rect.x = WIDTH // 2 - prompt_rect.width // 2
+        prompt_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - prompt_rect.height // 2
+
+        button_rect = pygame.Rect(prompt_rect.x - 60, ACTUAL_HEIGHT + 15, 40, 40)
+        button_image = pygame.transform.scale(
+            pygame.image.load(f'images/entity_img/env_item_img/key_t.png').convert_alpha(),
+            (40, 40),
+        )
+
+        screen.blit(button_image, button_rect)
+        screen.blit(prompt_surface, prompt_rect)
+
+    def __load_image(self):
+        image = pygame.transform.scale(
+            pygame.image.load(f'images/character_img/kitty.png').convert_alpha(),
             (self.__image_width, self.__image_height),
         )
         return image

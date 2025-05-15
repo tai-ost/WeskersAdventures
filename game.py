@@ -3,7 +3,7 @@ import pygame
 from constants import WIDTH, HEIGHT, FPS, ACTUAL_HEIGHT, FLOOR_HEIGHT
 from wesker import Wesker
 from hud import HUD
-from scenes import Scene, Door, Enemy, EnvironmentItem
+from scenes import Scene, Door, Enemy, EnvironmentItem, ItemBox
 from scripts import (script_main_hall, script_gh_corr, script_gh_gallery,
                      script_enrico_room, script_altar, script_main_lab,
                      script_east_wing_stairway, script_dark_corridor, script_garden_shed,
@@ -411,7 +411,8 @@ class Game:
             Door(0,
                  'empty_door', 150, 270,
                  7, 6, 'East Wing Stairway', WIDTH // 2,
-                 self.__font_special)
+                 self.__font_special),
+            ItemBox(self.__font_special)
         ]
 
         # roofed_passage - 8
@@ -657,7 +658,7 @@ class Game:
                          Scene(6, 'east_wing_stairway', east_wing_stairway,
                                self.__font_special),
                          Scene(7, 'east_wing_storeroom', east_wing_storeroom,
-                               self.__font_special, 0, 490),
+                               self.__font_special, 0, 490, overlay_image=True),
                          Scene(8, 'roofed_passage', roofed_passage,
                                self.__font_special, 200),
                          Scene(9, 'garden_shed', garden_shed,
