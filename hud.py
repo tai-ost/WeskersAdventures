@@ -217,7 +217,7 @@ class HUD:
         if not self.__grace_period:
             if not self.__defensive_item_count:
                 self.__health_points -= dmg
-                self.__poisoned = is_poisonous
+                self.__poisoned = is_poisonous or self.__poisoned
             else:
                 self.__defensive_item_count = max(0, self.__defensive_item_count - 1)
             self.__grace_period = pygame.time.get_ticks() + 1000
@@ -330,6 +330,15 @@ class HUD:
                                  (self.__health_rect.width + INVENTORY_SLOT_WIDTH * slot_number + 13, 13,
                                   54, 54),
                                  2)
+            num_image = pygame.transform.scale(
+                pygame.image.load(
+                    f'images/hud_img/other/{slot_number + 1}.png'
+                ).convert_alpha(),
+                (15, 15),
+            )
+            num_rect = pygame.Rect(self.__health_rect.width + INVENTORY_SLOT_WIDTH * slot_number, 0,
+                                   15, 15)
+            screen.blit(num_image, num_rect)
 
     def __show_ammo(self, screen):
         ammo_surface = self.__font.render(f'Ammo: {self.__ammo_loaded}/{self.__ammo_stored}',

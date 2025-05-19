@@ -299,9 +299,10 @@ class Game:
         self.__font_special = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
         self.__font_special_menu = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 40)
         self.__font_special_caption = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 50)
+        self.__font_controls = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 20)
 
     def __prepare_menu(self):
-        self.__menu = Menu(self.__font_special_menu, self.__font_special_caption)
+        self.__menu = Menu(self.__font_special_menu, self.__font_special_caption, self.__font_controls)
         self.__menu.update_start_time(self.__time_passed)
 
     def __prepare_hud(self):
@@ -359,7 +360,11 @@ class Game:
             Door(300,
                  'empty_door', 150, 270,
                  2, 3, 'Large Gallery', 0,
-                 self.__font_special)
+                 self.__font_special),
+            EnvironmentItem(20, ACTUAL_HEIGHT - 100, 2, self.__font_special),
+            EnvironmentItem(300, ACTUAL_HEIGHT - 100, 3, self.__font_special),
+            EnvironmentItem(500, ACTUAL_HEIGHT - 100, 4, self.__font_special)
+
         ]
 
         # large_gallery_front - 3
@@ -395,7 +400,8 @@ class Game:
             Door(WIDTH // 2 + 150,
                  'empty_door', 150, 270,
                  5, 6, 'East Wing Stairway', WIDTH - 220,
-                 self.__font_special)
+                 self.__font_special),
+            Enemy(WIDTH - 150, 1)
         ]
 
         # east_wing_stairway - 6
@@ -706,7 +712,7 @@ class Game:
 
 
 class Menu:
-    def __init__(self, font_buttons: pygame.font.Font, font_caption: pygame.font.Font):
+    def __init__(self, font_buttons: pygame.font.Font, font_caption: pygame.font.Font, font_controls: pygame.font.Font):
         self.__background_image = ''
         self.__background_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
 
@@ -714,6 +720,7 @@ class Menu:
 
         self.__font_buttons = font_buttons
         self.__font_caption = font_caption
+        self.__font_controls = font_controls
 
         self.__caption_color = pygame.Color(250, 250, 250)
         self.__caption_text = self.__font_caption.render('Wesker\'s Adventures', 1, self.__caption_color)
@@ -735,6 +742,56 @@ class Menu:
         self.__exit_button_rect = self.__exit_button_surface.get_rect()
         self.__exit_button_rect.x = WIDTH // 2 - self.__exit_button_rect.width // 2
         self.__exit_button_rect.y = self.__play_button_rect.y + 50
+
+        self.__wasd_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/wasd.png').convert_alpha(),
+            (140, 90),
+        )
+        self.__wasd_rect = pygame.Rect(WIDTH // 4 - 70, HEIGHT - 200, 140, 90)
+        self.__wasd_text_surface = self.__font_controls.render('Movement', 1, self.__button_color_idle)
+        self.__wasd_text_rect = self.__wasd_text_surface.get_rect()
+        self.__wasd_text_rect.x = self.__wasd_rect.x + self.__wasd_rect.width // 2 - self.__wasd_text_rect.width // 2
+        self.__wasd_text_rect.y = self.__wasd_rect.y + self.__wasd_rect.height + 10
+
+        self.__c_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/c.png').convert_alpha(),
+            (40, 40),
+        )
+        self.__c_rect = pygame.Rect(WIDTH // 2 - 20, HEIGHT - 200, 40, 40)
+        self.__c_text_surface = self.__font_controls.render('Combine herbs', 1, self.__button_color_idle)
+        self.__c_text_rect = self.__c_text_surface.get_rect()
+        self.__c_text_rect.x = self.__c_rect.x + self.__c_rect.width // 2 - self.__c_text_rect.width // 2
+        self.__c_text_rect.y = self.__c_rect.y + self.__c_rect.height + 10
+
+        self.__u_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/u.png').convert_alpha(),
+            (40, 40),
+        )
+        self.__u_rect = pygame.Rect(WIDTH // 2 - 20, self.__c_text_rect.y + 30, 40, 40)
+        self.__u_text_surface = self.__font_controls.render('Use the item', 1, self.__button_color_idle)
+        self.__u_text_rect = self.__u_text_surface.get_rect()
+        self.__u_text_rect.x = self.__u_rect.x + self.__u_rect.width // 2 - self.__u_text_rect.width // 2
+        self.__u_text_rect.y = self.__u_rect.y + self.__u_rect.height + 10
+
+        self.__rmb_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/rmb.png').convert_alpha(),
+            (60, 80),
+        )
+        self.__rmb_rect = pygame.Rect(WIDTH - WIDTH // 4 - 50, HEIGHT - 200, 60, 80)
+        self.__rmb_text_surface = self.__font_controls.render('Aim', 1, self.__button_color_idle)
+        self.__rmb_text_rect = self.__rmb_text_surface.get_rect()
+        self.__rmb_text_rect.x = self.__rmb_rect.x + self.__rmb_rect.width // 2 - self.__rmb_text_rect.width // 2
+        self.__rmb_text_rect.y = self.__rmb_rect.y + self.__rmb_rect.height + 10
+
+        self.__lmb_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/lmb.png').convert_alpha(),
+            (60, 80),
+        )
+        self.__lmb_rect = pygame.Rect(self.__rmb_rect.x + self.__rmb_rect.width + 20, HEIGHT - 200, 60, 80)
+        self.__lmb_text_surface = self.__font_controls.render('Fire', 1, self.__button_color_idle)
+        self.__lmb_text_rect = self.__lmb_text_surface.get_rect()
+        self.__lmb_text_rect.x = self.__lmb_rect.x + self.__lmb_rect.width // 2 - self.__lmb_text_rect.width // 2
+        self.__lmb_text_rect.y = self.__lmb_rect.y + self.__lmb_rect.height + 10
 
     def check_button_hover(self, mouse_pos):
         if self.__play_button_rect.collidepoint(mouse_pos):
@@ -769,12 +826,28 @@ class Menu:
     def __show_caption(self, screen):
         screen.blit(self.__caption_text, self.__caption_rect)
 
+    def __draw_controls(self, screen):
+        screen.blit(self.__wasd_image, self.__wasd_rect)
+        screen.blit(self.__c_image, self.__c_rect)
+        screen.blit(self.__u_image, self.__u_rect)
+        screen.blit(self.__rmb_image, self.__rmb_rect)
+        screen.blit(self.__lmb_image, self.__lmb_rect)
+        ...
+
+        screen.blit(self.__wasd_text_surface, self.__wasd_text_rect)
+        screen.blit(self.__c_text_surface, self.__c_text_rect)
+        screen.blit(self.__u_text_surface, self.__u_text_rect)
+        screen.blit(self.__rmb_text_surface, self.__rmb_text_rect)
+        screen.blit(self.__lmb_text_surface, self.__lmb_text_rect)
+        ...
+
     def __show_buttons(self, screen):
         screen.blit(self.__play_button_surface, self.__play_button_rect)
         screen.blit(self.__exit_button_surface, self.__exit_button_rect)
 
     def draw_menu(self, screen):
         self.__draw_background(screen)
+        self.__draw_controls(screen)
         self.__show_caption(screen)
         self.__show_buttons(screen)
 

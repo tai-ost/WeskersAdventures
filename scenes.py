@@ -337,10 +337,11 @@ class ItemBox:
         self.__check_box_collision(wesker)
 
     def __check_box_collision(self, wesker: Wesker):
-        if self.__rect.colliderect(wesker.get_hitbox_rect()):
-            self.__action = True
-        else:
-            self.__action = False
+        if not self.__opened:
+            if self.__rect.colliderect(wesker.get_hitbox_rect()):
+                self.__action = True
+            else:
+                self.__action = False
 
     def __show_prompt(self, screen):
         prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
@@ -394,12 +395,19 @@ class Kitty:
 
     def check_entity_logic(self, wesker: Wesker, _):
         self.__check_kitty_collision(wesker)
+        self.__check_kitty_position()
 
     def __check_kitty_collision(self, wesker: Wesker):
         if self.__rect.colliderect(wesker.get_hitbox_rect()):
             self.__action = True
         else:
             self.__action = False
+
+    def __check_kitty_position(self):
+        if pygame.time.get_ticks() // 1000 % 2:
+            self.__rect.y = 330
+        else:
+            self.__rect.y = 350
 
     def __show_prompt(self, screen):
         prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)

@@ -50,6 +50,12 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
+    enter_img = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+            (50, 40),
+        )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
     wesker.change_x_position(WIDTH // 2 + 100)
@@ -136,6 +142,7 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -161,6 +168,12 @@ def script_east_wing_stairway(scene: Scene, wesker: Wesker, screen: pygame.Surfa
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -195,6 +208,7 @@ def script_east_wing_stairway(scene: Scene, wesker: Wesker, screen: pygame.Surfa
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -218,6 +232,12 @@ def script_dark_corridor(scene: Scene, wesker: Wesker, screen: pygame.Surface, c
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -248,6 +268,7 @@ def script_dark_corridor(scene: Scene, wesker: Wesker, screen: pygame.Surface, c
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -273,6 +294,12 @@ def script_garden_shed(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -303,6 +330,7 @@ def script_garden_shed(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -340,6 +368,12 @@ def script_gh_corr(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: 
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -395,6 +429,7 @@ def script_gh_corr(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: 
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -419,6 +454,12 @@ def script_gh_gallery(scene: Scene, wesker: Wesker, screen: pygame.Surface, cloc
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -446,6 +487,7 @@ def script_gh_gallery(scene: Scene, wesker: Wesker, screen: pygame.Surface, cloc
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -473,6 +515,12 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -533,6 +581,7 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -566,6 +615,12 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -629,6 +684,7 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -653,6 +709,12 @@ def script_altar(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: py
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -708,6 +770,7 @@ def script_altar(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: py
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -731,6 +794,12 @@ def script_altar_after_fight(scene: Scene, wesker: Wesker, screen: pygame.Surfac
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -773,6 +842,7 @@ def script_altar_after_fight(scene: Scene, wesker: Wesker, screen: pygame.Surfac
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -838,6 +908,12 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
 
     floor_color = (0, 0, 0)
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40),
+    )
+    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -961,6 +1037,7 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
             screen.blit(dark_surface, impaled_rect)
 
         screen.blit(line_surface, line_rect)
+        screen.blit(enter_img, enter_rect)
 
         pygame.display.flip()
         clock.tick(FPS)
