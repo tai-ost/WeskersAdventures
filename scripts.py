@@ -764,6 +764,8 @@ def script_altar(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: py
         screen.blit(lisa_img, lisa_rect)
         screen.blit(chris_img, chris_rect)
 
+        scene.draw_overlay(screen)
+
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         if next_line == 0:
@@ -963,7 +965,7 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
                     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
                     if next_line == 4:
-                        wesker.change_x_position(WIDTH - 600)
+                        wesker.change_x_position(WIDTH - 630)
                         wesker.change_state('wesker_control_down')
                     elif next_line == 5:
                         chris_img = pygame.transform.scale(
@@ -1002,6 +1004,7 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
                     elif next_line == 37:
                         wesker.change_x_position(WIDTH - 350)
                     elif next_line == 38:
+                        scene.change_background_image('main_lab_broken')
                         wesker.change_x_position(WIDTH - 380)
                         wesker.change_y_position(ACTUAL_HEIGHT - 300)
                         chris_img = pygame.transform.scale(
@@ -1024,6 +1027,8 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
         screen.blit(chris_img, chris_rect)
         screen.blit(rebecca_img, rebecca_rect)
 
+        scene.draw_overlay(screen)
+
         pygame.draw.rect(screen, floor_color, floor_rect)
 
         if (next_line == 0) or (next_line == 1) or (next_line == 3) or(next_line == 42) or (next_line == 43):
@@ -1038,6 +1043,37 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
 
         screen.blit(line_surface, line_rect)
         screen.blit(enter_img, enter_rect)
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def script_end_screen(screen: pygame.Surface, final_time: int, seven_minutes: bool,
+                      font: pygame.font.Font, clock: pygame.time.Clock):
+    end_var = 'seven' if seven_minutes else 'basic'
+    end_screen_img = pygame.transform.scale(
+        pygame.image.load(f'images/background_img/endscreen_{end_var}.png').convert_alpha(),
+        (1280, 720),)
+    end_screen_rect = pygame.Rect(0, 0, 1280, 720)
+
+    seconds = final_time // 1000
+    minutes = seconds // 60
+    seconds %= 60
+    time_surface = font.render(f'{minutes:0>2}:{seconds:0>2}', 1, pygame.Color(250, 250, 250))
+    time_rect = time_surface.get_rect()
+    time_rect.x = WIDTH - 230
+    time_rect.y = 270
+
+    script_running = True
+    while script_running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return 0
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+                return 0
+
+        screen.blit(end_screen_img, end_screen_rect)
+        screen.blit(time_surface, time_rect)
 
         pygame.display.flip()
         clock.tick(FPS)

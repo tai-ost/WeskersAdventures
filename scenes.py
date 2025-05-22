@@ -82,6 +82,18 @@ class Scene:
     def draw_for_script(self, screen):
         self.__draw_background(screen)
 
+    def change_background_image(self, background_image):
+        self.__background_image = pygame.transform.scale(
+            pygame.image.load(f'images/background_img/{background_image}.png').convert_alpha(),
+            (WIDTH, ACTUAL_HEIGHT),
+        )
+
+        if self.__overlay:
+            self.__overlay_image = pygame.transform.scale(
+                pygame.image.load(f'images/background_img/{background_image}_overlay.png').convert_alpha(),
+                (WIDTH, ACTUAL_HEIGHT),
+            )
+
     def __draw_background(self, screen):
         screen.blit(self.__background_image, self.__background_rect)
 

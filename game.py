@@ -7,7 +7,7 @@ from scenes import Scene, Door, Enemy, EnvironmentItem, ItemBox
 from scripts import (script_main_hall, script_gh_corr, script_gh_gallery,
                      script_enrico_room, script_altar, script_main_lab,
                      script_east_wing_stairway, script_dark_corridor, script_garden_shed,
-                     script_generator_room, script_altar_after_fight)
+                     script_generator_room, script_altar_after_fight, script_end_screen)
 
 
 class Game:
@@ -40,6 +40,8 @@ class Game:
         self.__wesker: Wesker = Wesker()
 
         self.__lisa = True
+        self.__chris_moved = False
+        self.__altar_start = 0
 
         self.__next_script = 1
 
@@ -126,7 +128,14 @@ class Game:
         self.__hud.check_health()
         self.__hud.update_time(self.__time_passed)
         self.__lisa = self.__hud.check_lisa_state()
+        self.__check_altar()
         self.__check_scripts()
+
+    def __check_altar(self):
+        if self.__altar_start and not self.__chris_moved:
+            if self.__time_passed - self.__altar_start > 15000:
+                self.__scenes[18].change_background_image('altar_2')
+                self.__chris_moved = True
 
     def __check_scripts(self):
         # Entry script
@@ -195,7 +204,7 @@ class Game:
             self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
 
         # Generator Room script - Wesker hides from Chris, then follows him into Enrico Room
-        elif (self.__current_scene == 15) and (self.__next_script == 7) and (self.__wesker.get_hitbox_rect().x > 400):
+        elif (self.__current_scene == 15) and (self.__next_script == 7) and (self.__wesker.get_hitbox_rect().x > 200):
             self.__next_script = script_generator_room(self.__scenes[self.__current_scene], self.__wesker,
                                                        self.__screen, self.__clock)
 
@@ -215,7 +224,6 @@ class Game:
             self.__scenes[15].delete_last_entity()
             self.__current_scene = 15
             self.__wesker.change_x_position(WIDTH - 220)
-            self.__scenes[18].add_entity(Enemy(WIDTH - 300, 4))
             self.__scenes[17].add_entity(Door(WIDTH // 2 - 75, 'empty_door',
                                               150, 270,
                                               17, 18, 'Altar', 40,
@@ -229,9 +237,13 @@ class Game:
             self.__wesker.change_x_velocity(0)
             self.__wesker.change_y_velocity(0)
             self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+            self.__altar_start = pygame.time.get_ticks()
+            self.__scenes[18].change_background_image('altar_1')
 
         # Altar after fight script - Wesker lets Chris go forward
         elif (self.__current_scene == 18) and (self.__next_script == 10) and not self.__lisa:
+            self.__scenes[18].change_background_image('altar_3')
+
             self.__next_script = script_altar_after_fight(self.__scenes[self.__current_scene], self.__wesker,
                                                           self.__screen, self.__clock)
 
@@ -239,6 +251,16 @@ class Game:
             self.__wesker.change_y_velocity(0)
             self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
 
+            self.__scenes[18].change_background_image('altar_3')
+
+            self.__scenes[18].add_entity(Door(40, 'empty_door', 150, 270,
+                                              18, 17, 'Main Hall', WIDTH // 2 - 75,
+                                              self.__font_special))
+            self.__scenes[18].add_entity(Door(WIDTH - 150, 'empty_door', 150, 270,
+                                              18, 19, 'Main Lab', 0,
+                                              self.__font_special))
+
+        # Main Lab script
         elif (self.__current_scene == 19) and (self.__next_script == 11):
             self.__next_script = script_main_lab(self.__scenes[self.__current_scene], self.__wesker,
                                                  self.__screen, self.__clock)
@@ -246,6 +268,11 @@ class Game:
             self.__wesker.change_x_velocity(0)
             self.__wesker.change_y_velocity(0)
             self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
+
+        # End screen script
+        elif self.__next_script == 12:
+            self.__next_script = script_end_screen(self.__screen, self.__time_passed, self.__seven_minutes,
+                                                   self.__font_special_caption, self.__clock)
 
     def __move(self):
         self.__wesker.move()
@@ -309,21 +336,6 @@ class Game:
         self.__hud = HUD(self.__font_special)
 
     def __prepare_scenes(self):
-        # scene_1_entities = [
-        #     Door(WIDTH - 170,
-        #          'door_var_1', 150, 270,
-        #          1, 0, 'scene1', WIDTH - 170, self.__font_special),
-        #     Door(20,
-        #          'door_var_2', 150, 270,
-        #          1, 2, 'scene3', 20, self.__font_special),
-        #     Enemy(self.__width // 2, 0),
-        #     Enemy(self.__width // 3, 0),
-        #     Enemy(self.__width // 4, 0),
-        #     EnvironmentItem(self.__width // 2, ACTUAL_HEIGHT - 80, 1, self.__font_special),
-        #     EnvironmentItem(self.__width // 3, ACTUAL_HEIGHT - 80, 1, self.__font_special)
-        # ]
-
-        # mansion - 0
         main_hall = [
             Door(WIDTH // 2 - 75,
                  'empty_door', 150, 270,
@@ -539,14 +551,7 @@ class Game:
 
         # altar - 18
         altar = [
-            Door(40,
-                 'empty_door', 150, 270,
-                 18, 17, 'Main Hall', WIDTH // 2 - 75,
-                 self.__font_special),
-            Door(WIDTH - 150,
-                 'empty_door', 150, 270,
-                 18, 19, 'Main Lab', 0,
-                 self.__font_special)
+            Enemy(WIDTH - 300, 4)
         ]
 
         # main_lab - 19
@@ -660,7 +665,7 @@ class Game:
                          Scene(4, 'large_gallery_back', large_gallery_back,
                                self.__font_special, overlay_image=True),
                          Scene(5, 'dark_corridor', dark_corridor,
-                               self.__font_special),
+                               self.__font_special, 50),
                          Scene(6, 'east_wing_stairway', east_wing_stairway,
                                self.__font_special),
                          Scene(7, 'east_wing_storeroom', east_wing_storeroom,
@@ -672,7 +677,7 @@ class Game:
                          Scene(10, 'main_garden', main_garden,
                                self.__font_special),
                          Scene(11, 'falls_area', falls_area,
-                               self.__font_special),
+                               self.__font_special, 0, 100, overlay_image=True),
                          Scene(12, 'fall_tunnel', fall_tunnel,
                                self.__font_special),
                          Scene(13, 'mining_area', mining_area,
@@ -685,10 +690,10 @@ class Game:
                                self.__font_special),
                          Scene(17, 'stairway_passage', stairway_passage,
                                self.__font_special, 140, 140),
-                         Scene(18, 'altar', altar,
-                               self.__font_special, 40),
-                         Scene(19, 'main_lab', main_lab,
-                               self.__font_special, 0, 150),
+                         Scene(18, 'altar_0', altar,
+                               self.__font_special, 40, 30, overlay_image=True),
+                         Scene(19, 'main_lab_fine', main_lab,
+                               self.__font_special, 0, 150, overlay_image=True),
                          Scene(20, 'zigzag_start', zigzag_start,
                                self.__font_special),
                          Scene(21, 'zigzag_end', zigzag_end,
@@ -713,7 +718,6 @@ class Game:
 
 class Menu:
     def __init__(self, font_buttons: pygame.font.Font, font_caption: pygame.font.Font, font_controls: pygame.font.Font):
-        self.__background_image = ''
         self.__background_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
 
         self.__start_time_in_menu = 0
@@ -777,7 +781,7 @@ class Menu:
             pygame.image.load(f'images/hud_img/other/rmb.png').convert_alpha(),
             (60, 80),
         )
-        self.__rmb_rect = pygame.Rect(WIDTH - WIDTH // 4 - 50, HEIGHT - 200, 60, 80)
+        self.__rmb_rect = pygame.Rect(WIDTH - WIDTH // 4 - 100, HEIGHT - 200, 60, 80)
         self.__rmb_text_surface = self.__font_controls.render('Aim', 1, self.__button_color_idle)
         self.__rmb_text_rect = self.__rmb_text_surface.get_rect()
         self.__rmb_text_rect.x = self.__rmb_rect.x + self.__rmb_rect.width // 2 - self.__rmb_text_rect.width // 2
@@ -787,11 +791,21 @@ class Menu:
             pygame.image.load(f'images/hud_img/other/lmb.png').convert_alpha(),
             (60, 80),
         )
-        self.__lmb_rect = pygame.Rect(self.__rmb_rect.x + self.__rmb_rect.width + 20, HEIGHT - 200, 60, 80)
+        self.__lmb_rect = pygame.Rect(self.__rmb_rect.x + self.__rmb_rect.width + 20, self.__rmb_rect.y, 60, 80)
         self.__lmb_text_surface = self.__font_controls.render('Fire', 1, self.__button_color_idle)
         self.__lmb_text_rect = self.__lmb_text_surface.get_rect()
         self.__lmb_text_rect.x = self.__lmb_rect.x + self.__lmb_rect.width // 2 - self.__lmb_text_rect.width // 2
         self.__lmb_text_rect.y = self.__lmb_rect.y + self.__lmb_rect.height + 10
+
+        self.__r_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/r.png').convert_alpha(),
+            (40, 40),
+        )
+        self.__r_rect = pygame.Rect(self.__lmb_rect.x + self.__lmb_rect.width + 40, self.__rmb_rect.y + 20, 40, 40)
+        self.__r_text_surface = self.__font_controls.render('Reload', 1, self.__button_color_idle)
+        self.__r_text_rect = self.__r_text_surface.get_rect()
+        self.__r_text_rect.x = self.__r_rect.x + self.__r_rect.width // 2 - self.__r_text_rect.width // 2
+        self.__r_text_rect.y = self.__r_rect.y + self.__r_rect.height + 10
 
     def check_button_hover(self, mouse_pos):
         if self.__play_button_rect.collidepoint(mouse_pos):
@@ -821,7 +835,7 @@ class Menu:
         return self.__start_time_in_menu
 
     def __draw_background(self, screen):
-        pygame.draw.rect(screen, (50, 50, 50), self.__background_rect)  # Replace with actual background
+        pygame.draw.rect(screen, (50, 50, 50), self.__background_rect)
 
     def __show_caption(self, screen):
         screen.blit(self.__caption_text, self.__caption_rect)
@@ -832,14 +846,14 @@ class Menu:
         screen.blit(self.__u_image, self.__u_rect)
         screen.blit(self.__rmb_image, self.__rmb_rect)
         screen.blit(self.__lmb_image, self.__lmb_rect)
-        ...
+        screen.blit(self.__r_image, self.__r_rect)
 
         screen.blit(self.__wasd_text_surface, self.__wasd_text_rect)
         screen.blit(self.__c_text_surface, self.__c_text_rect)
         screen.blit(self.__u_text_surface, self.__u_text_rect)
         screen.blit(self.__rmb_text_surface, self.__rmb_text_rect)
         screen.blit(self.__lmb_text_surface, self.__lmb_text_rect)
-        ...
+        screen.blit(self.__r_text_surface, self.__r_text_rect)
 
     def __show_buttons(self, screen):
         screen.blit(self.__play_button_surface, self.__play_button_rect)
