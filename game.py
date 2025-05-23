@@ -7,7 +7,7 @@ from scenes import Scene, Door, Enemy, EnvironmentItem, ItemBox
 from scripts import (script_main_hall, script_gh_corr, script_gh_gallery,
                      script_enrico_room, script_altar, script_main_lab,
                      script_east_wing_stairway, script_dark_corridor, script_garden_shed,
-                     script_generator_room, script_altar_after_fight, script_end_screen)
+                     script_generator_room, script_altar_after_fight, script_end_screen, script_death)
 
 
 class Game:
@@ -52,6 +52,9 @@ class Game:
         self.__font_special: pygame.font.Font
         self.__scenes: list
 
+    def __del__(self):
+        pygame.quit()
+
     def run(self):
         while self.__running:
             if not self.__in_menu:
@@ -86,8 +89,10 @@ class Game:
     def __check_events(self):
         self.__hud.update_ammo(self.__wesker.get_ammo())
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT) or (self.__hud.get_health_points() <= 0) or (self.__next_script == 0):
+            if (event.type == pygame.QUIT) or (self.__next_script == 0):
                 self.__running = False
+            elif self.__hud.get_health_points() <= 0:
+                self.__next_script = script_death(self.__screen, self.__font_special, self.__clock)
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE):
                 self.__in_menu = True
                 self.__menu.update_start_time(self.__time_passed)
@@ -675,7 +680,7 @@ class Game:
                          Scene(9, 'garden_shed', garden_shed,
                                self.__font_special, 0, 420),
                          Scene(10, 'main_garden', main_garden,
-                               self.__font_special),
+                               self.__font_special, overlay_image=True),
                          Scene(11, 'falls_area', falls_area,
                                self.__font_special, 0, 100, overlay_image=True),
                          Scene(12, 'fall_tunnel', fall_tunnel,

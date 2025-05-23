@@ -1077,3 +1077,35 @@ def script_end_screen(screen: pygame.Surface, final_time: int, seven_minutes: bo
 
         pygame.display.flip()
         clock.tick(FPS)
+
+
+def script_death(screen: pygame.Surface, font: pygame.font.Font, clock: pygame.time.Clock):
+    death_screen_img = pygame.transform.scale(
+        pygame.image.load(f'images/background_img/death_screen.png').convert_alpha(),
+        (1280, 720), )
+    death_screen_rect = pygame.Rect(0, 0, 1280, 720)
+
+    enter_img = pygame.transform.scale(
+        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
+        (50, 40), )
+    enter_rect = pygame.Rect(WIDTH // 2 - 35, 590, 50, 40)
+
+    sent_surface = font.render(f'Press            to exit', 1, pygame.Color(250, 250, 250))
+    sent_rect = sent_surface.get_rect()
+    sent_rect.x = WIDTH // 2 - sent_rect.width // 2
+    sent_rect.y = 600
+
+    script_running = True
+    while script_running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return 0
+            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+                return 0
+
+        screen.blit(death_screen_img, death_screen_rect)
+        screen.blit(sent_surface, sent_rect)
+        screen.blit(enter_img, enter_rect)
+
+        pygame.display.flip()
+        clock.tick(FPS)
