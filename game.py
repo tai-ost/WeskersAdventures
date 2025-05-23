@@ -30,10 +30,16 @@ class Game:
 
         self.__fps: int = FPS
         self.__clock: pygame.time.Clock = pygame.time.Clock()
-        self.__seven_minutes: bool = False  # ... is all he can spare to play with you ;)
+        self.__seven_minutes: bool = True  # ... is all he can spare to play with you ;)
 
         self.__current_scene: int = start_scene
         self.__previous_scene: int = start_scene
+
+        self.__current_music: str = 'mansion_theme'
+        pygame.mixer.music.load(f'music/{self.__current_music}.wav')
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.pause()
+        self.__music_paused: bool = True
 
         self.__alpha_level: int = 0
 
@@ -70,31 +76,48 @@ class Game:
             self.__clock.tick(self.__fps)
 
     def __check_menu_events(self):
+        if not self.__music_paused:
+            pygame.mixer.music.pause()
+            self.__music_paused = True
+
         event: pygame.event.Event
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.__running = False
             elif event.type == pygame.MOUSEMOTION:
                 self.__menu.check_button_hover(event.pos)
+                self.__menu.check_volume_pointer(event.pos)
             elif (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
+                self.__menu.change_volume_pointer_state(True)
                 if self.__menu.check_play_button_pressed():
                     self.__in_menu = False
                     self.__in_menu_time = pygame.time.get_ticks() - self.__menu.get_start_time_in_menu()
                 self.__running = not self.__menu.check_exit_button_pressed()
+            elif (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1):
+                self.__menu.change_volume_pointer_state(False)
 
     def __check_time(self):
         self.__time_passed = pygame.time.get_ticks() - self.__start_time - self.__in_menu_time
-        self.__seven_minutes = self.__time_passed > 420_000
+        self.__seven_minutes = self.__time_passed < 420_000
 
     def __check_events(self):
+        if self.__music_paused:
+            pygame.mixer.music.unpause()
+            self.__music_paused = False
+
         self.__hud.update_ammo(self.__wesker.get_ammo())
+
+        event: pygame.event.Event
         for event in pygame.event.get():
             if (event.type == pygame.QUIT) or (self.__next_script == 0):
                 self.__running = False
             elif self.__hud.get_health_points() <= 0:
-                self.__next_script = script_death(self.__screen, self.__font_special, self.__clock)
+                self.__alpha_level = 255
+                self.__next_script = script_death(self.__scenes[self.__current_scene], self.__screen,
+                                                  self.__font_special, self.__clock)
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE):
                 self.__in_menu = True
+                self.__menu.change_volume_pointer_state(False)
                 self.__menu.update_start_time(self.__time_passed)
             elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
                 self.__wesker.check_aiming_event(event)
@@ -105,6 +128,7 @@ class Game:
                 action_code, action = self.__scenes[self.__current_scene].check_scene_event(self.__wesker, self.__hud,
                                                                                             event.key)
                 if action_code == 1:
+                    self.__change_current_music(self.__scenes[action].get_music())
                     self.__change_current_scene(action)
                     self.__alpha_level = 80
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_h):
@@ -270,12 +294,15 @@ class Game:
             self.__next_script = script_main_lab(self.__scenes[self.__current_scene], self.__wesker,
                                                  self.__screen, self.__clock)
 
+            self.__scenes[self.__current_scene].change_background_image('black_screen')
+
             self.__wesker.change_x_velocity(0)
             self.__wesker.change_y_velocity(0)
             self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
 
         # End screen script
         elif self.__next_script == 12:
+            self.__alpha_level = 255
             self.__next_script = script_end_screen(self.__screen, self.__time_passed, self.__seven_minutes,
                                                    self.__font_special_caption, self.__clock)
 
@@ -317,6 +344,14 @@ class Game:
     def __draw_hud(self):
         self.__hud.draw_hud(self.__screen)
 
+    def __change_current_music(self, new_music):
+        if new_music != self.__current_music:
+            self.__current_music = new_music
+            pygame.mixer.music.stop()
+            pygame.mixer.music.unload()
+            pygame.mixer.music.load(f'music/{self.__current_music}.wav')
+            pygame.mixer.music.play(-1)
+
     def __change_current_scene(self, next_scene):
         self.__previous_scene = self.__current_scene
         self.__current_scene = next_scene
@@ -353,7 +388,8 @@ class Game:
             Door(WIDTH - 400,
                  'empty_door', 150, 270,
                  0, 17, 'Stairway Passage', WIDTH - 520,
-                 self.__font_special)
+                 self.__font_special),
+            Enemy(0, 3)
         ]
 
         # graveyard_top - 1
@@ -660,65 +696,62 @@ class Game:
         ]
 
         self.__scenes = [Scene(0, 'main_hall', main_hall,
-                               self.__font_special, 100, 100),
+                               self.__font_special, 'mansion_theme', 100, 100),
                          Scene(1, 'graveyard_top', graveyard_top,
-                               self.__font_special, 490, overlay_image=True),
+                               self.__font_special, 'mansion_theme', 490, overlay_image=True),
                          Scene(2, 'graveyard_bottom', graveyard_bottom,
-                               self.__font_special),
+                               self.__font_special, 'mansion_theme'),
                          Scene(3, 'large_gallery_front', large_gallery_front,
-                               self.__font_special),
+                               self.__font_special, 'mansion_theme'),
                          Scene(4, 'large_gallery_back', large_gallery_back,
-                               self.__font_special, overlay_image=True),
+                               self.__font_special, 'mansion_theme', overlay_image=True),
                          Scene(5, 'dark_corridor', dark_corridor,
-                               self.__font_special, 50),
+                               self.__font_special, 'mansion_theme', 50),
                          Scene(6, 'east_wing_stairway', east_wing_stairway,
-                               self.__font_special),
+                               self.__font_special, 'mansion_theme'),
                          Scene(7, 'east_wing_storeroom', east_wing_storeroom,
-                               self.__font_special, 0, 490, overlay_image=True),
+                               self.__font_special, 'save_theme', 0, 490, overlay_image=True),
                          Scene(8, 'roofed_passage', roofed_passage,
-                               self.__font_special, 200),
+                               self.__font_special, 'mansion_theme', 200),
                          Scene(9, 'garden_shed', garden_shed,
-                               self.__font_special, 0, 420),
+                               self.__font_special, 'garden_theme', 0, 420),
                          Scene(10, 'main_garden', main_garden,
-                               self.__font_special, overlay_image=True),
+                               self.__font_special, 'garden_theme', overlay_image=True),
                          Scene(11, 'falls_area', falls_area,
-                               self.__font_special, 0, 100, overlay_image=True),
+                               self.__font_special, 'garden_theme', 0, 100, overlay_image=True),
                          Scene(12, 'fall_tunnel', fall_tunnel,
-                               self.__font_special),
+                               self.__font_special, 'tunnel_theme'),
                          Scene(13, 'mining_area', mining_area,
-                               self.__font_special),
+                               self.__font_special, 'tunnel_theme'),
                          Scene(14, 'forked_passage', forked_passage,
-                               self.__font_special),
+                               self.__font_special, 'tunnel_theme'),
                          Scene(15, 'generator_room', generator_room,
-                               self.__font_special),
+                               self.__font_special, 'tunnel_theme'),
                          Scene(16, 'enrico_room', enrico_room,
-                               self.__font_special),
+                               self.__font_special, 'tunnel_theme'),
                          Scene(17, 'stairway_passage', stairway_passage,
-                               self.__font_special, 140, 140),
+                               self.__font_special, 'mansion_theme', 140, 140),
                          Scene(18, 'altar_0', altar,
-                               self.__font_special, 40, 30, overlay_image=True),
+                               self.__font_special, 'altar_theme', 40, 30, overlay_image=True),
                          Scene(19, 'main_lab_fine', main_lab,
-                               self.__font_special, 0, 150, overlay_image=True),
+                               self.__font_special, 'lab_theme', 0, 150, overlay_image=True),
                          Scene(20, 'zigzag_start', zigzag_start,
-                               self.__font_special),
+                               self.__font_special, 'garden_theme'),
                          Scene(21, 'zigzag_end', zigzag_end,
-                               self.__font_special, 300),
+                               self.__font_special, 'garden_theme', 300),
                          Scene(22, 'gh_entr_0', gh_entr_0,
-                               self.__font_special, 50),
+                               self.__font_special, 'gh_theme', 50),
                          Scene(23, 'gh_entr_1', gh_entr_1,
-                               self.__font_special, 300),
+                               self.__font_special, 'gh_theme', 300),
                          Scene(24, 'break_room', break_room,
-                               self.__font_special, 120),
+                               self.__font_special, 'save_theme', 120),
                          Scene(25, 'gh_corr_0', gh_corr_0,
-                               self.__font_special),
+                               self.__font_special, 'gh_theme'),
                          Scene(26, 'gh_corr_1', gh_corr_1,
-                               self.__font_special, 300),
+                               self.__font_special, 'gh_theme', 300),
                          Scene(27, 'gh_gallery', gh_gallery,
-                               self.__font_special),
+                               self.__font_special, 'gh_theme'),
                          ]
-
-    def __del__(self):
-        pygame.quit()
 
 
 class Menu:
@@ -731,12 +764,14 @@ class Menu:
         self.__font_caption = font_caption
         self.__font_controls = font_controls
 
+        # Caption
         self.__caption_color = pygame.Color(250, 250, 250)
         self.__caption_text = self.__font_caption.render('Wesker\'s Adventures', 1, self.__caption_color)
         self.__caption_rect = self.__caption_text.get_rect()
         self.__caption_rect.x = WIDTH // 2 - self.__caption_rect.width // 2
         self.__caption_rect.y = HEIGHT // 4
 
+        # Buttons
         self.__button_color_idle = pygame.Color(150, 150, 150)
         self.__button_color_hover = pygame.Color(230, 230, 230)
 
@@ -752,6 +787,26 @@ class Menu:
         self.__exit_button_rect.x = WIDTH // 2 - self.__exit_button_rect.width // 2
         self.__exit_button_rect.y = self.__play_button_rect.y + 50
 
+        # Volume
+        self.__volume: float = 0.5
+        pygame.mixer.music.set_volume(self.__volume)
+
+        self.__slider_rect = pygame.Rect(150, HEIGHT // 2,
+                                         200, 20)
+        self.__slider_color = pygame.Color(80, 80, 80)
+        self.__pointer_rect = pygame.Rect(int(self.__volume * 100 * 2) + self.__slider_rect.x - 5, HEIGHT // 2 - 5,
+                                          10, 30)
+        self.__pointer_color = pygame.Color(120, 120, 120)
+        self.__pointer_state = False
+
+        self.__volume_text_surface = self.__font_controls.render(f'Volume: {int(self.__volume * 100)}%', 1,
+                                                                 self.__button_color_idle)
+        self.__volume_text_rect = self.__volume_text_surface.get_rect()
+        self.__volume_text_rect.x = (self.__slider_rect.x + self.__slider_rect.width // 2 -
+                                     self.__volume_text_rect.width // 2)
+        self.__volume_text_rect.y = self.__slider_rect.y + self.__slider_rect.height + 15
+
+        # Controls
         self.__wasd_image = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/wasd.png').convert_alpha(),
             (140, 90),
@@ -812,6 +867,26 @@ class Menu:
         self.__r_text_rect.x = self.__r_rect.x + self.__r_rect.width // 2 - self.__r_text_rect.width // 2
         self.__r_text_rect.y = self.__r_rect.y + self.__r_rect.height + 10
 
+    def change_volume_pointer_state(self, state):
+        self.__pointer_state = state
+
+    def check_volume_pointer(self, mouse_pos):
+        if self.__pointer_state:
+            mouse_x, mouse_y = mouse_pos
+            if (self.__pointer_rect.y < mouse_y < self.__pointer_rect.y + self.__pointer_rect.height) and \
+                (150 < mouse_x < 350):
+                self.__pointer_rect.x = mouse_x
+                self.__volume = ((self.__pointer_rect.x - 150) // 2) * 0.01
+
+            if self.__pointer_rect.x < 150:
+                self.__pointer_rect.x = 150
+            if self.__pointer_rect.x > 350:
+                self.__pointer_rect.x = 350
+
+            pygame.mixer.music.set_volume(self.__volume)
+            self.__volume_text_surface = self.__font_controls.render(f'Volume: {int(self.__volume * 100)}%',
+                                                                     1, self.__button_color_idle)
+
     def check_button_hover(self, mouse_pos):
         if self.__play_button_rect.collidepoint(mouse_pos):
             self.__play_button_surface = self.__font_buttons.render('Play', 1, self.__button_color_hover)
@@ -864,10 +939,16 @@ class Menu:
         screen.blit(self.__play_button_surface, self.__play_button_rect)
         screen.blit(self.__exit_button_surface, self.__exit_button_rect)
 
+    def __show_volume_slider(self, screen):
+        pygame.draw.rect(screen, self.__slider_color, self.__slider_rect)
+        pygame.draw.rect(screen, self.__pointer_color, self.__pointer_rect)
+        screen.blit(self.__volume_text_surface, self.__volume_text_rect)
+
     def draw_menu(self, screen):
         self.__draw_background(screen)
         self.__draw_controls(screen)
         self.__show_caption(screen)
         self.__show_buttons(screen)
+        self.__show_volume_slider(screen)
 
         pygame.display.flip()

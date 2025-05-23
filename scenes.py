@@ -7,28 +7,29 @@ from hud import HUD
 
 
 class Scene:
-    def __init__(self, scene_id, background_image, entities, font,
-                 left_wall_width=0, right_wall_width=0, overlay_image=False):
-        self.__scene_id = scene_id
-        self.__background_image = pygame.transform.scale(
+    def __init__(self, scene_id: int, background_image: str, entities: list, font: pygame.font.Font, music: str,
+                 left_wall_width: int = 0, right_wall_width: int = 0, overlay_image: bool = False):
+        self.__scene_id: int = scene_id
+        self.__background_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/background_img/{background_image}.png').convert_alpha(),
             (WIDTH, ACTUAL_HEIGHT),
         )
 
-        self.__overlay = overlay_image
+        self.__overlay: bool = overlay_image
         if self.__overlay:
-            self.__overlay_image = pygame.transform.scale(
+            self.__overlay_image: pygame.Surface = pygame.transform.scale(
                 pygame.image.load(f'images/background_img/{background_image}_overlay.png').convert_alpha(),
                 (WIDTH, ACTUAL_HEIGHT),
             )
 
-        self.__left_wall_width = left_wall_width
-        self.__right_wall_width = right_wall_width
+        self.__left_wall_width: int = left_wall_width
+        self.__right_wall_width: int = right_wall_width
 
-        self.__background_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
+        self.__background_rect: pygame.Rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
         self.__entities: list = entities
 
-        self.__font = font
+        self.__font: pygame.font.Font = font
+        self.__music: str = music
 
     def get_left_wall(self):
         return self.__left_wall_width
@@ -44,6 +45,9 @@ class Scene:
 
     def get_entities(self):
         return self.__entities
+
+    def get_music(self):
+        return self.__music
 
     def check_scene_event(self, wesker: Wesker, hud: HUD, event_key):
         entity: Door | Enemy | EnvironmentItem | ItemBox | Kitty

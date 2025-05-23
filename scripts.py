@@ -1064,6 +1064,11 @@ def script_end_screen(screen: pygame.Surface, final_time: int, seven_minutes: bo
     time_rect.x = WIDTH - 230
     time_rect.y = 270
 
+    pygame.mixer.music.fadeout(1500)
+    pygame.mixer.music.unload()
+    pygame.mixer.music.load('music/ending_theme.wav')
+    pygame.mixer.music.play(-1)
+
     script_running = True
     while script_running:
         for event in pygame.event.get():
@@ -1079,7 +1084,7 @@ def script_end_screen(screen: pygame.Surface, final_time: int, seven_minutes: bo
         clock.tick(FPS)
 
 
-def script_death(screen: pygame.Surface, font: pygame.font.Font, clock: pygame.time.Clock):
+def script_death(scene: Scene, screen: pygame.Surface, font: pygame.font.Font, clock: pygame.time.Clock):
     death_screen_img = pygame.transform.scale(
         pygame.image.load(f'images/background_img/death_screen.png').convert_alpha(),
         (1280, 720), )
@@ -1094,6 +1099,9 @@ def script_death(screen: pygame.Surface, font: pygame.font.Font, clock: pygame.t
     sent_rect = sent_surface.get_rect()
     sent_rect.x = WIDTH // 2 - sent_rect.width // 2
     sent_rect.y = 600
+
+    scene.change_background_image('black_screen')
+    pygame.mixer.music.fadeout(1500)
 
     script_running = True
     while script_running:
