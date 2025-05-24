@@ -1004,6 +1004,7 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
                     elif next_line == 37:
                         wesker.change_x_position(WIDTH - 350)
                     elif next_line == 38:
+                        pygame.mixer.music.fadeout(800)
                         scene.change_background_image('main_lab_broken')
                         wesker.change_x_position(WIDTH - 380)
                         wesker.change_y_position(ACTUAL_HEIGHT - 300)

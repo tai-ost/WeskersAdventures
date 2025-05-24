@@ -86,7 +86,7 @@ class Scene:
     def draw_for_script(self, screen):
         self.__draw_background(screen)
 
-    def change_background_image(self, background_image):
+    def change_background_image(self, background_image: str):
         self.__background_image = pygame.transform.scale(
             pygame.image.load(f'images/background_img/{background_image}.png').convert_alpha(),
             (WIDTH, ACTUAL_HEIGHT),
@@ -108,29 +108,29 @@ class Scene:
 
 
 class Enemy:
-    def __init__(self, x, enemy_type):
-        self.entity_type = 'enemy'
+    def __init__(self, x: int, enemy_type: int, difficulty: int):
+        self.entity_type: str = 'enemy'
 
-        self.__name = ENEMY_TYPES[enemy_type][0]
+        self.__name: str = ENEMY_TYPES[enemy_type][0]
 
-        self.__health = ENEMY_TYPES[enemy_type][1]
-        self.__dmg = ENEMY_TYPES[enemy_type][2]
-        self.__velocity = ENEMY_TYPES[enemy_type][3]
-        self.__is_poisonous = ENEMY_TYPES[enemy_type][4]
+        self.__health: int = ENEMY_TYPES[enemy_type][1] + difficulty * 2
+        self.__dmg: int = ENEMY_TYPES[enemy_type][2] + (difficulty * 5 if self.__name != 'adder' else 0)
+        self.__velocity: int = ENEMY_TYPES[enemy_type][3]
+        self.__is_poisonous: bool = ENEMY_TYPES[enemy_type][4]
 
-        self.__width = ENEMY_TYPES[enemy_type][5]
-        self.__height = ENEMY_TYPES[enemy_type][6]
+        self.__width: int = ENEMY_TYPES[enemy_type][5]
+        self.__height: int = ENEMY_TYPES[enemy_type][6]
 
-        self.__x = x
-        self.__y = ACTUAL_HEIGHT - self.__height
+        self.__x: int = x
+        self.__y: int = ACTUAL_HEIGHT - self.__height
 
-        self.__rect = pygame.Rect(self.__x, self.__y, self.__width, self.__height)
+        self.__rect: pygame.Rect = pygame.Rect(self.__x, self.__y, self.__width, self.__height)
 
-        self.__direction = 0  # 0 - right, 1 - left
-        self.__last_frame = 0
-        self.__last_frame_count = 0
+        self.__direction: int = 0  # 0 - right, 1 - left
+        self.__last_frame: int = 0
+        self.__last_frame_count: int = 0
 
-        self.__alive = True
+        self.__alive: bool = True
 
     def get_x(self):
         return self.__rect.x

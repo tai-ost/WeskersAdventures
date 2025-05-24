@@ -23,6 +23,9 @@ class Game:
         self.__running: bool = True
         self.__in_menu: bool = True
 
+        self.__icon = pygame.image.load('images/icon.png')
+        pygame.display.set_icon(self.__icon)
+
         self.__width: int = WIDTH
         self.__height: int = HEIGHT
         self.__screensize: tuple = (self.__width, self.__height)
@@ -45,11 +48,13 @@ class Game:
 
         self.__wesker: Wesker = Wesker()
 
-        self.__lisa = True
-        self.__chris_moved = False
-        self.__altar_start = 0
+        self.__lisa: bool = True
+        self.__chris_moved: bool = False
+        self.__altar_start: int = 0
 
-        self.__next_script = 1
+        self.__next_script: int = 1
+
+        self.__difficulty: None | int = None
 
         self.__menu: Menu
         self.__hud: HUD
@@ -88,11 +93,28 @@ class Game:
                 self.__menu.check_button_hover(event.pos)
                 self.__menu.check_volume_pointer(event.pos)
             elif (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
+                self.__running = not self.__menu.check_exit_button_pressed()
                 self.__menu.change_volume_pointer_state(True)
                 if self.__menu.check_play_button_pressed():
+                    if self.__difficulty is None:
+                        self.__difficulty = 1
+                        self.__menu.set_difficulty(self.__difficulty)
+                        self.__prepare_scenes()
                     self.__in_menu = False
                     self.__in_menu_time = pygame.time.get_ticks() - self.__menu.get_start_time_in_menu()
-                self.__running = not self.__menu.check_exit_button_pressed()
+                if self.__difficulty is None:
+                    if self.__menu.check_dif_hard_button_pressed():
+                        self.__difficulty = 2
+                        self.__menu.set_difficulty(self.__difficulty)
+                        self.__prepare_scenes()
+                    if self.__menu.check_dif_normal_button_pressed():
+                        self.__difficulty = 1
+                        self.__menu.set_difficulty(self.__difficulty)
+                        self.__prepare_scenes()
+                    if self.__menu.check_dif_easy_button_pressed():
+                        self.__difficulty = 0
+                        self.__menu.set_difficulty(self.__difficulty)
+                        self.__prepare_scenes()
             elif (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1):
                 self.__menu.change_volume_pointer_state(False)
 
@@ -272,6 +294,7 @@ class Game:
         # Altar after fight script - Wesker lets Chris go forward
         elif (self.__current_scene == 18) and (self.__next_script == 10) and not self.__lisa:
             self.__scenes[18].change_background_image('altar_3')
+            self.__chris_moved = True
 
             self.__next_script = script_altar_after_fight(self.__scenes[self.__current_scene], self.__wesker,
                                                           self.__screen, self.__clock)
@@ -279,8 +302,6 @@ class Game:
             self.__wesker.change_x_velocity(0)
             self.__wesker.change_y_velocity(0)
             self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
-
-            self.__scenes[18].change_background_image('altar_3')
 
             self.__scenes[18].add_entity(Door(40, 'empty_door', 150, 270,
                                               18, 17, 'Main Hall', WIDTH // 2 - 75,
@@ -360,7 +381,6 @@ class Game:
         self.__prepare_font()
         self.__prepare_menu()
         self.__prepare_hud()
-        self.__prepare_scenes()
 
     def __prepare_font(self):
         self.__font_special = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
@@ -389,7 +409,7 @@ class Game:
                  'empty_door', 150, 270,
                  0, 17, 'Stairway Passage', WIDTH - 520,
                  self.__font_special),
-            Enemy(0, 3)
+            Enemy(0, 3, self.__difficulty)
         ]
 
         # graveyard_top - 1
@@ -454,7 +474,7 @@ class Game:
                  'empty_door', 150, 270,
                  5, 6, 'East Wing Stairway', WIDTH - 220,
                  self.__font_special),
-            Enemy(WIDTH - 150, 1)
+            Enemy(WIDTH - 150, 1, self.__difficulty)
         ]
 
         # east_wing_stairway - 6
@@ -592,7 +612,7 @@ class Game:
 
         # altar - 18
         altar = [
-            Enemy(WIDTH - 300, 4)
+            Enemy(WIDTH - 300, 4, self.__difficulty)
         ]
 
         # main_lab - 19
@@ -712,7 +732,7 @@ class Game:
                          Scene(7, 'east_wing_storeroom', east_wing_storeroom,
                                self.__font_special, 'save_theme', 0, 490, overlay_image=True),
                          Scene(8, 'roofed_passage', roofed_passage,
-                               self.__font_special, 'mansion_theme', 200),
+                               self.__font_special, 'mansion_theme', 200, overlay_image=True),
                          Scene(9, 'garden_shed', garden_shed,
                                self.__font_special, 'garden_theme', 0, 420),
                          Scene(10, 'main_garden', main_garden,
@@ -742,13 +762,13 @@ class Game:
                          Scene(22, 'gh_entr_0', gh_entr_0,
                                self.__font_special, 'gh_theme', 50),
                          Scene(23, 'gh_entr_1', gh_entr_1,
-                               self.__font_special, 'gh_theme', 300),
+                               self.__font_special, 'gh_theme'),
                          Scene(24, 'break_room', break_room,
                                self.__font_special, 'save_theme', 120),
                          Scene(25, 'gh_corr_0', gh_corr_0,
                                self.__font_special, 'gh_theme'),
                          Scene(26, 'gh_corr_1', gh_corr_1,
-                               self.__font_special, 'gh_theme', 300),
+                               self.__font_special, 'gh_theme'),
                          Scene(27, 'gh_gallery', gh_gallery,
                                self.__font_special, 'gh_theme'),
                          ]
@@ -759,6 +779,8 @@ class Menu:
         self.__background_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
 
         self.__start_time_in_menu = 0
+
+        self.__difficulty: None | int = None
 
         self.__font_buttons = font_buttons
         self.__font_caption = font_caption
@@ -805,6 +827,33 @@ class Menu:
         self.__volume_text_rect.x = (self.__slider_rect.x + self.__slider_rect.width // 2 -
                                      self.__volume_text_rect.width // 2)
         self.__volume_text_rect.y = self.__slider_rect.y + self.__slider_rect.height + 15
+
+        # Difficulty
+        self.__dif_surface = self.__font_controls.render('Difficulty:', 1, self.__button_color_idle)
+        self.__dif_rect = self.__dif_surface.get_rect()
+        self.__dif_rect.x = WIDTH - 350
+        self.__dif_rect.y = HEIGHT // 2 - 40
+
+        self.__hard_button_state = False
+        self.__hard_button_surface = self.__font_controls.render('Hard', 1, self.__button_color_idle)
+        self.__hard_button_rect = self.__hard_button_surface.get_rect()
+        self.__hard_button_rect.x = self.__dif_rect.x
+        self.__hard_button_rect.y = self.__dif_rect.y + 30
+
+        self.__normal_button_state = False
+        self.__normal_button_surface = self.__font_controls.render('Normal', 1, self.__button_color_idle)
+        self.__normal_button_rect = self.__normal_button_surface.get_rect()
+        self.__normal_button_rect.x = self.__dif_rect.x
+        self.__normal_button_rect.y = self.__hard_button_rect.y + 30
+
+        self.__easy_button_state = False
+        self.__easy_button_surface = self.__font_controls.render('Easy', 1, self.__button_color_idle)
+        self.__easy_button_rect = self.__easy_button_surface.get_rect()
+        self.__easy_button_rect.x = self.__dif_rect.x
+        self.__easy_button_rect.y = self.__normal_button_rect.y + 30
+
+        self.__dif_set_surface = self.__font_controls.render('Normal', 1, self.__button_color_idle)
+        self.__dif_set_rect: pygame.Rect = pygame.Rect(1, 1, 1, 1)
 
         # Controls
         self.__wasd_image = pygame.transform.scale(
@@ -902,25 +951,78 @@ class Menu:
             self.__exit_button_surface = self.__font_buttons.render('Exit', 1, self.__button_color_idle)
             self.__exit_button_state = False
 
+        if self.__difficulty is None:
+            if self.__hard_button_rect.collidepoint(mouse_pos):
+                self.__hard_button_surface = self.__font_controls.render('Hard', 1, self.__button_color_hover)
+                self.__hard_button_state = True
+            else:
+                self.__hard_button_surface = self.__font_controls.render('Hard', 1, self.__button_color_idle)
+                self.__hard_button_state = False
+
+            if self.__normal_button_rect.collidepoint(mouse_pos):
+                self.__normal_button_surface = self.__font_controls.render('Normal', 1, self.__button_color_hover)
+                self.__normal_button_state = True
+            else:
+                self.__normal_button_surface = self.__font_controls.render('Normal', 1, self.__button_color_idle)
+                self.__normal_button_state = False
+
+            if self.__easy_button_rect.collidepoint(mouse_pos):
+                self.__easy_button_surface = self.__font_controls.render('Easy', 1, self.__button_color_hover)
+                self.__easy_button_state = True
+            else:
+                self.__easy_button_surface = self.__font_controls.render('Easy', 1, self.__button_color_idle)
+                self.__easy_button_state = False
+
     def check_play_button_pressed(self):
         return self.__play_button_state
 
     def check_exit_button_pressed(self):
         return self.__exit_button_state
 
-    def update_start_time(self, time):
+    def check_dif_hard_button_pressed(self):
+        return self.__hard_button_state
+
+    def check_dif_normal_button_pressed(self):
+        return self.__normal_button_state
+
+    def check_dif_easy_button_pressed(self):
+        return self.__easy_button_state
+
+    def set_difficulty(self, difficulty: int):
+        self.__difficulty = difficulty
+
+        self.__hard_button_state = False
+        self.__normal_button_state = False
+        self.__easy_button_state = False
+
+        self.__dif_rect.y += 55
+        self.__dif_set_rect.x = self.__dif_rect.x + self.__dif_rect.width + 5
+        self.__dif_set_rect.y = self.__dif_rect.y
+        if difficulty == 0:
+            self.__dif_set_surface = self.__font_controls.render('Easy', 1, self.__button_color_idle)
+            self.__dif_set_rect.width = self.__easy_button_surface.get_rect().width
+            self.__dif_set_rect.height = self.__easy_button_surface.get_rect().height
+        elif difficulty == 1:
+            self.__dif_set_rect.width = self.__normal_button_surface.get_rect().width
+            self.__dif_set_rect.height = self.__normal_button_surface.get_rect().height
+        elif difficulty == 2:
+            self.__dif_set_surface = self.__font_controls.render('Hard', 1, self.__button_color_idle)
+            self.__dif_set_rect.width = self.__hard_button_surface.get_rect().width
+            self.__dif_set_rect.height = self.__hard_button_surface.get_rect().height
+
+    def update_start_time(self, time: int):
         self.__start_time_in_menu = time
 
     def get_start_time_in_menu(self):
         return self.__start_time_in_menu
 
-    def __draw_background(self, screen):
+    def __draw_background(self, screen: pygame.Surface):
         pygame.draw.rect(screen, (50, 50, 50), self.__background_rect)
 
-    def __show_caption(self, screen):
+    def __show_caption(self, screen: pygame.Surface):
         screen.blit(self.__caption_text, self.__caption_rect)
 
-    def __draw_controls(self, screen):
+    def __show_controls(self, screen: pygame.Surface):
         screen.blit(self.__wasd_image, self.__wasd_rect)
         screen.blit(self.__c_image, self.__c_rect)
         screen.blit(self.__u_image, self.__u_rect)
@@ -935,20 +1037,30 @@ class Menu:
         screen.blit(self.__lmb_text_surface, self.__lmb_text_rect)
         screen.blit(self.__r_text_surface, self.__r_text_rect)
 
-    def __show_buttons(self, screen):
+    def __show_buttons(self, screen: pygame.Surface):
         screen.blit(self.__play_button_surface, self.__play_button_rect)
         screen.blit(self.__exit_button_surface, self.__exit_button_rect)
 
-    def __show_volume_slider(self, screen):
+    def __show_difficulty(self, screen: pygame.Surface):
+        screen.blit(self.__dif_surface, self.__dif_rect)
+        if self.__difficulty is None:
+            screen.blit(self.__hard_button_surface, self.__hard_button_rect)
+            screen.blit(self.__normal_button_surface, self.__normal_button_rect)
+            screen.blit(self.__easy_button_surface, self.__easy_button_rect)
+        else:
+            screen.blit(self.__dif_set_surface, self.__dif_set_rect)
+
+    def __show_volume_slider(self, screen: pygame.Surface):
         pygame.draw.rect(screen, self.__slider_color, self.__slider_rect)
         pygame.draw.rect(screen, self.__pointer_color, self.__pointer_rect)
         screen.blit(self.__volume_text_surface, self.__volume_text_rect)
 
-    def draw_menu(self, screen):
+    def draw_menu(self, screen: pygame.Surface):
         self.__draw_background(screen)
-        self.__draw_controls(screen)
+        self.__show_controls(screen)
         self.__show_caption(screen)
         self.__show_buttons(screen)
+        self.__show_difficulty(screen)
         self.__show_volume_slider(screen)
 
         pygame.display.flip()
