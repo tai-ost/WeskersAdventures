@@ -4,21 +4,23 @@ from constants import WIDTH, FPS, ACTUAL_HEIGHT, GRAVITY_ACCELERATION, DEFAULT_A
 
 
 class Wesker:
-    def __init__(self):
-        self.__hitbox_width = 100
-        self.__hitbox_height = 250
+    def __init__(self, reload_sound: pygame.mixer.Sound, shot_sound: pygame.mixer.Sound):
+        self.__hitbox_width: int = 100
+        self.__hitbox_height: int = 250
 
-        self.__image_width = 220
-        self.__image_height = 250
+        self.__image_width: int = 220
+        self.__image_height: int = 250
 
-        self.__x_coord = WIDTH // 2 - self.__image_width // 2
-        self.__y_coord = ACTUAL_HEIGHT - self.__image_height
+        self.__x_coord: int = WIDTH // 2 - self.__image_width // 2
+        self.__y_coord: int = ACTUAL_HEIGHT - self.__image_height
 
-        self.__rect = pygame.Rect(self.__x_coord, self.__y_coord, self.__image_width, self.__image_height)
-        self.__hitbox_rect = pygame.Rect(self.__rect.x + 50, self.__rect.y, self.__hitbox_width, self.__hitbox_height)
+        self.__rect: pygame.Rect = pygame.Rect(self.__x_coord, self.__y_coord,
+                                               self.__image_width, self.__image_height)
+        self.__hitbox_rect: pygame.Rect = pygame.Rect(self.__rect.x + 50, self.__rect.y,
+                                                      self.__hitbox_width, self.__hitbox_height)
 
         # Кортеж с возможными состояниями и соответствующими им названиями изображений
-        self.__possible_states = (
+        self.__possible_states: tuple = (
             'wesker_idle_right',                # 0
             'wesker_idle_left',                 # 1
             'wesker_running_right_frame_0',     # 2
@@ -37,20 +39,21 @@ class Wesker:
             'wesker_reloading_frame_1'          # 15
         )
 
-        self.__state = self.__possible_states[0]  # Текущее состояние
-        self.__last_running_frame = False  # Последний использованный кадр при движении (0 или 1)
-        self.__last_running_frame_count = 0  # Счетчик для изменения изображения
+        self.__state: int = self.__possible_states[0]  # Текущее состояние
+        self.__last_running_frame: bool = False  # Последний использованный кадр при движении (0 или 1)
+        self.__last_running_frame_count: int = 0  # Счетчик для изменения изображения
 
-        self.__x_velocity = self.__y_velocity = 0
-        self.__max_x_velocity = 10
-        self.__max_y_velocity = 20
+        self.__x_velocity: float = 0
+        self.__y_velocity: float = 0
+        self.__max_x_velocity: int = 10
+        self.__max_y_velocity: int = 20
 
-        self.__acceleration = 0.5
-        self.__deceleration = 0.35
-        self.__gravity_acceleration = GRAVITY_ACCELERATION / FPS
+        self.__acceleration: float = 0.5
+        self.__deceleration: float = 0.35
+        self.__gravity_acceleration: float = GRAVITY_ACCELERATION / FPS
 
         # Словарь с флагами для направлений движения
-        self.__direction = {
+        self.__direction: dict = {
             pygame.K_w: False,
             pygame.K_s: False,
             pygame.K_a: False,
@@ -59,20 +62,27 @@ class Wesker:
         }
 
         # Флаг для определения idle/aiming состояния по окончании движения, False = right, True = Left
-        self.__last_direction = False
+        self.__last_direction: bool = False
 
-        self.__ammo = DEFAULT_AMMO_LOADED
+        self.__ammo: int = DEFAULT_AMMO_LOADED
 
-        self.__reloading = False
-        self.__reloading_start_time = 0
-        self.__reloading_end_time = 0
+        # Sounds
+        self.__reload_sound: pygame.mixer.Sound = reload_sound
+        self.__reload_sound.set_volume(0.2)
 
-        self.__aiming = False
-        self.__firing = False
-        self.__firing_delay = 0
-        self.have_fired = False
+        self.__shot_sound: pygame.mixer.Sound = shot_sound
+        self.__shot_sound.set_volume(0.05)
 
-        self.__kitty = False
+        self.__reloading: bool = False
+        self.__reloading_start_time: int = 0
+        self.__reloading_end_time: int = 0
+
+        self.__aiming: bool = False
+        self.__firing: bool = False
+        self.__firing_delay: int = 0
+        self.have_fired: bool = False
+
+        self.__kitty: bool = False
 
     def get_movement_keys(self):
         return self.__direction.keys()
@@ -100,6 +110,7 @@ class Wesker:
 
     def reload(self, new_ammo):
         self.__reloading = True
+        self.__reload_sound.play()
         self.__reloading_start_time = self.__reloading_end_time = pygame.time.get_ticks()
         self.__ammo += new_ammo
 
@@ -193,6 +204,7 @@ class Wesker:
             if self.__firing and (self.__firing_delay == 0) and (self.__ammo > 0):
                 self.__firing_delay = pygame.time.get_ticks() + 500
                 self.have_fired = True
+                self.__shot_sound.play()
                 if not self.__kitty:
                     self.__ammo = max(0, self.__ammo - 1)
                 self.__state = self.__possible_states[12 + self.__last_direction]

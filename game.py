@@ -46,7 +46,18 @@ class Game:
 
         self.__alpha_level: int = 0
 
-        self.__wesker: Wesker = Wesker()
+        # Sounds
+        self.__sound_gunshot: pygame.mixer.Sound = pygame.mixer.Sound('sounds/sound_gunshot.mp3')
+        self.__sound_gunshot.set_volume(0.3)
+
+        self.__sound_reload: pygame.mixer.Sound = pygame.mixer.Sound('sounds/sound_reload.mp3')
+
+        self.__sound_wesker_fires: pygame.mixer.Sound = pygame.mixer.Sound('sounds/sound_wesker_fires.mp3')
+
+        # Wesker
+        self.__wesker: Wesker = Wesker(self.__sound_reload, self.__sound_wesker_fires)
+
+        self.__sound_wesker_fires.set_volume(0.2)
 
         self.__lisa: bool = True
         self.__chris_moved: bool = False
@@ -166,12 +177,6 @@ class Game:
                 self.__hud.use_item()
             elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_c):
                 self.__hud.combine_herbs()
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_p):
-                self.__next_script = script_main_hall(self.__scenes[self.__current_scene], self.__wesker,
-                                                      self.__screen, self.__clock)
-                self.__wesker.change_x_velocity(0)
-                self.__wesker.change_y_velocity(0)
-                self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
 
     def __check_logic(self):
         self.__wesker.check_wesker_logic(self.__scenes[self.__current_scene])
@@ -192,7 +197,7 @@ class Game:
         # Entry script
         if (self.__current_scene == 0) and (self.__next_script == 1):
             self.__next_script = script_main_hall(self.__scenes[self.__current_scene], self.__wesker,
-                                                  self.__screen, self.__clock)
+                                                  self.__screen, self.__clock, self.__sound_gunshot)
             self.__wesker.change_x_velocity(0)
             self.__wesker.change_y_velocity(0)
             self.__wesker.change_y_position(ACTUAL_HEIGHT - self.__wesker.get_hitbox_rect().height)
@@ -244,6 +249,9 @@ class Game:
                                               150, 270,
                                               11, 12, 'the tunnel behind the Waterfall',
                                               0, self.__font_special))
+            self.__scenes[20].add_entity(Enemy(WIDTH - 300, 2, self.__difficulty))
+            if self.__difficulty > 0:
+                self.__scenes[11].add_entity(Enemy(WIDTH // 2, 1, self.__difficulty))
 
         # Guardhouse Gallery script - Wesker hears Rebecca, decides to go to Generator Room
         elif (self.__current_scene == 27) and (self.__next_script == 6):
@@ -266,7 +274,7 @@ class Game:
         # Enrico Room script - Wesker shots Enrico and runs away
         elif (self.__current_scene == 16) and (self.__next_script == 8):
             self.__next_script = script_enrico_room(self.__scenes[self.__current_scene], self.__wesker,
-                                                    self.__screen, self.__clock)
+                                                    self.__screen, self.__clock, self.__sound_wesker_fires)
 
             self.__wesker.change_x_velocity(0)
             self.__wesker.change_y_velocity(0)
@@ -279,6 +287,9 @@ class Game:
                                               150, 270,
                                               17, 18, 'Altar', 40,
                                               self.__font_special))
+            self.__scenes[5].add_entity(Enemy(WIDTH // 2, 3, self.__difficulty))
+            self.__scenes[6].add_entity(Enemy(200, 3, self.__difficulty))
+            self.__scenes[3].add_entity(Enemy(200, 3, self.__difficulty))
 
         # Altar before fight script - Wesker finds Lisa, Chris enters the scene, the fight starts
         elif (self.__current_scene == 18) and (self.__next_script == 9):
@@ -313,7 +324,7 @@ class Game:
         # Main Lab script
         elif (self.__current_scene == 19) and (self.__next_script == 11):
             self.__next_script = script_main_lab(self.__scenes[self.__current_scene], self.__wesker,
-                                                 self.__screen, self.__clock)
+                                                 self.__screen, self.__clock, self.__sound_wesker_fires)
 
             self.__scenes[self.__current_scene].change_background_image('black_screen')
 
@@ -408,8 +419,7 @@ class Game:
             Door(WIDTH - 400,
                  'empty_door', 150, 270,
                  0, 17, 'Stairway Passage', WIDTH - 520,
-                 self.__font_special),
-            Enemy(0, 3, self.__difficulty)
+                 self.__font_special)
         ]
 
         # graveyard_top - 1
@@ -435,9 +445,7 @@ class Game:
                  2, 3, 'Large Gallery', 0,
                  self.__font_special),
             EnvironmentItem(20, ACTUAL_HEIGHT - 100, 2, self.__font_special),
-            EnvironmentItem(300, ACTUAL_HEIGHT - 100, 3, self.__font_special),
-            EnvironmentItem(500, ACTUAL_HEIGHT - 100, 4, self.__font_special)
-
+            Enemy(300, 0, self.__difficulty)
         ]
 
         # large_gallery_front - 3
@@ -474,7 +482,8 @@ class Game:
                  'empty_door', 150, 270,
                  5, 6, 'East Wing Stairway', WIDTH - 220,
                  self.__font_special),
-            Enemy(WIDTH - 150, 1, self.__difficulty)
+            EnvironmentItem(WIDTH // 2 + 50, ACTUAL_HEIGHT - 105, 5, self.__font_special),
+            Enemy(WIDTH - 150, 0, self.__difficulty)
         ]
 
         # east_wing_stairway - 6
@@ -491,6 +500,7 @@ class Game:
                  'empty_door', 150, 270,
                  7, 6, 'East Wing Stairway', WIDTH // 2,
                  self.__font_special),
+            EnvironmentItem(WIDTH // 4, ACTUAL_HEIGHT - 155, 6, self.__font_special),
             ItemBox(self.__font_special)
         ]
 
@@ -503,7 +513,8 @@ class Game:
             Door(200,
                  'empty_door', 150, 270,
                  8, 9, 'Garden Shed', 0,
-                 self.__font_special)
+                 self.__font_special),
+            Enemy(300, 1, self.__difficulty)
         ]
 
         # garden_shed - 9
@@ -515,7 +526,10 @@ class Game:
             Door(WIDTH // 2,
                  'empty_door', 150, 270,
                  9, 10, 'Main Garden', 0,
-                 self.__font_special)
+                 self.__font_special),
+            EnvironmentItem(WIDTH // 2 - 300, ACTUAL_HEIGHT - 80, 1, self.__font_special),
+            EnvironmentItem(WIDTH // 2 + 58, ACTUAL_HEIGHT - 163, 6, self.__font_special),
+            EnvironmentItem(80, ACTUAL_HEIGHT - 214, 5, self.__font_special)
         ]
 
         # main_garden - 10
@@ -527,7 +541,8 @@ class Game:
             Door(WIDTH // 2 - 200,
                  'empty_door', 150, 270,
                  10, 11, 'Falls Area', WIDTH - 300,
-                 self.__font_special)
+                 self.__font_special),
+            EnvironmentItem(WIDTH - 100, ACTUAL_HEIGHT - 100, 3, self.__font_special)
         ]
 
         # falls_area - 11
@@ -539,7 +554,9 @@ class Game:
             Door(0,
                  'empty_door', 150, 270,
                  11, 20, 'Zigzag Passage', WIDTH - 220,
-                 self.__font_special)
+                 self.__font_special),
+            EnvironmentItem(100, ACTUAL_HEIGHT - 100, 4, self.__font_special),
+            Enemy(150, 1, self.__difficulty)
         ]
 
         # fall_tunnel - 12
@@ -563,7 +580,8 @@ class Game:
             Door(WIDTH // 2 + 100,
                  'empty_door', 150, 270,
                  13, 14, 'Forked Passage', 100,
-                 self.__font_special)
+                 self.__font_special),
+            Enemy(200, 3, self.__difficulty)
         ]
 
         # forked_passage - 14
@@ -575,7 +593,8 @@ class Game:
             Door(WIDTH - 150,
                  'empty_door', 150, 270,
                  14, 15, 'Generator Room', 50,
-                 self.__font_special)
+                 self.__font_special),
+            Enemy(WIDTH - 300, 3, self.__difficulty)
         ]
 
         # generator_room - 15
@@ -607,7 +626,7 @@ class Game:
             Door(WIDTH - 300,
                  'empty_door', 150, 270,
                  17, 0, 'Main Hall', WIDTH - 350,
-                 self.__font_special),
+                 self.__font_special)
         ]
 
         # altar - 18
@@ -632,7 +651,8 @@ class Game:
             Door(0,
                  'empty_door', 150, 270,
                  20, 21, 'the next part of passage', WIDTH - 220,
-                 self.__font_special)
+                 self.__font_special),
+            Enemy(400, 2, self.__difficulty)
         ]
 
         # zigzag_end - 21
@@ -644,7 +664,8 @@ class Game:
             Door(300,
                  'empty_door', 150, 270,
                  21, 22, 'Guardhouse', WIDTH - 220,
-                 self.__font_special)
+                 self.__font_special),
+            Enemy(WIDTH // 2, 2, self.__difficulty)
         ]
 
         # gh_entr_0 - 22
@@ -656,7 +677,8 @@ class Game:
             Door(WIDTH // 2,
                  'empty_door', 150, 270,
                  22, 23, 'Corridor', WIDTH - 220,
-                 self.__font_special)
+                 self.__font_special),
+            EnvironmentItem(150, ACTUAL_HEIGHT - 100 - 82, 4, self.__font_special)
         ]
 
         # gh_entr_1 - 23
@@ -672,7 +694,8 @@ class Game:
             Door(350,
                  'empty_door', 150, 270,
                  23, 25, 'Main Corridor', 0,
-                 self.__font_special)
+                 self.__font_special),
+            Enemy(300, 0, self.__difficulty)
         ]
 
         # break_room - 24
@@ -680,7 +703,10 @@ class Game:
             Door(WIDTH - 150,
                  'empty_door', 150, 270,
                  24, 23, 'Break Room', WIDTH - 500,
-                 self.__font_special)
+                 self.__font_special),
+            EnvironmentItem(WIDTH // 2 + 100, ACTUAL_HEIGHT - 178, 6, self.__font_special),
+            EnvironmentItem(WIDTH // 2 - 180, ACTUAL_HEIGHT - 140, 5, self.__font_special),
+            EnvironmentItem(150, ACTUAL_HEIGHT - 80, 1, self.__font_special)
         ]
 
         # gh_corr_0 - 25 (Main Corridor)
@@ -728,7 +754,7 @@ class Game:
                          Scene(5, 'dark_corridor', dark_corridor,
                                self.__font_special, 'mansion_theme', 50),
                          Scene(6, 'east_wing_stairway', east_wing_stairway,
-                               self.__font_special, 'mansion_theme'),
+                               self.__font_special, 'mansion_theme', overlay_image=True),
                          Scene(7, 'east_wing_storeroom', east_wing_storeroom,
                                self.__font_special, 'save_theme', 0, 490, overlay_image=True),
                          Scene(8, 'roofed_passage', roofed_passage,
@@ -760,7 +786,7 @@ class Game:
                          Scene(21, 'zigzag_end', zigzag_end,
                                self.__font_special, 'garden_theme', 300),
                          Scene(22, 'gh_entr_0', gh_entr_0,
-                               self.__font_special, 'gh_theme', 50),
+                               self.__font_special, 'gh_theme'),
                          Scene(23, 'gh_entr_1', gh_entr_1,
                                self.__font_special, 'gh_theme'),
                          Scene(24, 'break_room', break_room,
@@ -772,6 +798,15 @@ class Game:
                          Scene(27, 'gh_gallery', gh_gallery,
                                self.__font_special, 'gh_theme'),
                          ]
+
+        if self.__difficulty < 2:
+            self.__scenes[27].add_entity(EnvironmentItem(WIDTH // 2 + 110, ACTUAL_HEIGHT - 187, 1,
+                                                         self.__font_special))
+        if self.__difficulty == 0:
+            self.__scenes[22].add_entity(EnvironmentItem(WIDTH // 2 - 190, ACTUAL_HEIGHT - 100, 2,
+                                                         self.__font_special))
+            self.__scenes[24].add_entity(EnvironmentItem(WIDTH - 200, ACTUAL_HEIGHT - 100, 3,
+                                                         self.__font_special))
 
 
 class Menu:
@@ -880,11 +915,21 @@ class Menu:
             pygame.image.load(f'images/hud_img/other/u.png').convert_alpha(),
             (40, 40),
         )
-        self.__u_rect = pygame.Rect(WIDTH // 2 - 20, self.__c_text_rect.y + 30, 40, 40)
+        self.__u_rect = pygame.Rect(WIDTH // 2 - 100, self.__c_text_rect.y + 30, 40, 40)
         self.__u_text_surface = self.__font_controls.render('Use the item', 1, self.__button_color_idle)
         self.__u_text_rect = self.__u_text_surface.get_rect()
         self.__u_text_rect.x = self.__u_rect.x + self.__u_rect.width // 2 - self.__u_text_rect.width // 2
         self.__u_text_rect.y = self.__u_rect.y + self.__u_rect.height + 10
+
+        self.__h_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/h.png').convert_alpha(),
+            (40, 40),
+        )
+        self.__h_rect = pygame.Rect(WIDTH // 2 + 60, self.__c_text_rect.y + 30, 40, 40)
+        self.__h_text_surface = self.__font_controls.render('Hide\\show HUD', 1, self.__button_color_idle)
+        self.__h_text_rect = self.__h_text_surface.get_rect()
+        self.__h_text_rect.x = self.__h_rect.x + self.__h_rect.width // 2 - self.__h_text_rect.width // 2
+        self.__h_text_rect.y = self.__h_rect.y + self.__h_rect.height + 10
 
         self.__rmb_image = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/rmb.png').convert_alpha(),
@@ -916,6 +961,16 @@ class Menu:
         self.__r_text_rect.x = self.__r_rect.x + self.__r_rect.width // 2 - self.__r_text_rect.width // 2
         self.__r_text_rect.y = self.__r_rect.y + self.__r_rect.height + 10
 
+        self.__esc_image = pygame.transform.scale(
+            pygame.image.load(f'images/hud_img/other/esc.png').convert_alpha(),
+            (50, 40),
+        )
+        self.__esc_rect = pygame.Rect(WIDTH - 300, 20, 50, 40)
+        self.__esc_text_surface = self.__font_controls.render('Return to menu (Pause)', 1, self.__button_color_idle)
+        self.__esc_text_rect = self.__esc_text_surface.get_rect()
+        self.__esc_text_rect.x = self.__esc_rect.x + self.__esc_rect.width + 10
+        self.__esc_text_rect.y = self.__esc_rect.y + self.__esc_rect.height // 2 - self.__esc_text_rect.height // 2 + 2
+
     def change_volume_pointer_state(self, state):
         self.__pointer_state = state
 
@@ -923,7 +978,7 @@ class Menu:
         if self.__pointer_state:
             mouse_x, mouse_y = mouse_pos
             if (self.__pointer_rect.y < mouse_y < self.__pointer_rect.y + self.__pointer_rect.height) and \
-                (150 < mouse_x < 350):
+                    (150 < mouse_x < 350):
                 self.__pointer_rect.x = mouse_x
                 self.__volume = ((self.__pointer_rect.x - 150) // 2) * 0.01
 
@@ -1026,16 +1081,20 @@ class Menu:
         screen.blit(self.__wasd_image, self.__wasd_rect)
         screen.blit(self.__c_image, self.__c_rect)
         screen.blit(self.__u_image, self.__u_rect)
+        screen.blit(self.__h_image, self.__h_rect)
         screen.blit(self.__rmb_image, self.__rmb_rect)
         screen.blit(self.__lmb_image, self.__lmb_rect)
         screen.blit(self.__r_image, self.__r_rect)
+        screen.blit(self.__esc_image, self.__esc_rect)
 
         screen.blit(self.__wasd_text_surface, self.__wasd_text_rect)
         screen.blit(self.__c_text_surface, self.__c_text_rect)
         screen.blit(self.__u_text_surface, self.__u_text_rect)
+        screen.blit(self.__h_text_surface, self.__h_text_rect)
         screen.blit(self.__rmb_text_surface, self.__rmb_text_rect)
         screen.blit(self.__lmb_text_surface, self.__lmb_text_rect)
         screen.blit(self.__r_text_surface, self.__r_text_rect)
+        screen.blit(self.__esc_text_surface, self.__esc_text_rect)
 
     def __show_buttons(self, screen: pygame.Surface):
         screen.blit(self.__play_button_surface, self.__play_button_rect)

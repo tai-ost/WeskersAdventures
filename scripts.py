@@ -9,7 +9,8 @@ CHAR_IMG_WIDTH = 220
 CHAR_IMG_HEIGHT = 250
 
 
-def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: pygame.time.Clock):
+def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface,
+                     clock: pygame.time.Clock, sound: pygame.mixer.Sound):
     font = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
     line_color = pygame.Color(250, 250, 250)
     lines = [
@@ -74,6 +75,9 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock
         )
     jill_rect = pygame.Rect(WIDTH // 2 - 100, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
 
+    sound_gunshot = sound
+    sound_played = False
+
     script_running = True
     while script_running:
         for event in pygame.event.get():
@@ -88,6 +92,9 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock
                     line_rect.y = (ACTUAL_HEIGHT + FLOOR_HEIGHT // 2) - line_rect.height // 2
 
                     if next_line == 6:
+                        if not sound_played:
+                            sound_gunshot.play()
+                            sound_played = True
                         chris_img = pygame.transform.scale(
                             pygame.image.load(f'images/character_img/chris_idle_left.png').convert_alpha(),
                             (CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT),
@@ -203,6 +210,7 @@ def script_east_wing_stairway(scene: Scene, wesker: Wesker, screen: pygame.Surfa
         scene.draw_for_script(screen)
         wesker.draw_wesker(screen)
         pygame.draw.rect(screen, floor_color, floor_rect)
+        scene.draw_overlay(screen)
 
         if next_line == 3:
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
@@ -587,7 +595,8 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
         clock.tick(FPS)
 
 
-def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: pygame.time.Clock):
+def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface,
+                       clock: pygame.time.Clock, sound: pygame.mixer.Sound):
     font = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
     line_color = pygame.Color(250, 250, 250)
     lines = [
@@ -633,6 +642,9 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
     )
     chris_rect = pygame.Rect(WIDTH - 350, ACTUAL_HEIGHT - CHAR_IMG_HEIGHT, CHAR_IMG_WIDTH, CHAR_IMG_HEIGHT)
 
+    sound_gunshot = sound
+    sound_played = False
+
     script_running = True
     while script_running:
         for event in pygame.event.get():
@@ -657,6 +669,9 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
                     elif next_line == 5:
                         wesker.change_state('wesker_aiming_right')
                     elif next_line == 6:
+                        if not sound_played:
+                            sound_gunshot.play()
+                            sound_played = True
                         wesker.change_state('wesker_firing_right')
                     elif next_line == 7:
                         chris_img = pygame.transform.scale(
@@ -850,7 +865,8 @@ def script_altar_after_fight(scene: Scene, wesker: Wesker, screen: pygame.Surfac
         clock.tick(FPS)
 
 
-def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: pygame.time.Clock):
+def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface,
+                    clock: pygame.time.Clock, sound: pygame.mixer.Sound):
     font = pygame.font.Font('fonts/SpecialElite-Regular.ttf', 22)
     line_color = pygame.Color(250, 250, 250)
     lines = [
@@ -876,7 +892,7 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
         'Wesker: The Tyrant Virus leaked polluting this whole place.',  # 19
         'Wesker: And unfortunately I had to give up my lovely members of S.T.A.R.S.',  # 20
         'Chris: You killed them with your own dirty hands!',  # 21
-        'Chris: You son of a *****!',  # 22
+        'Chris: You son of a...',  # 22
         'Rebecca: No...',  # 23
         'Wesker: Oh yes, dear.',  # 24
         'Wesker: Just like this.',  # 25
@@ -886,7 +902,6 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
         'Chris: You...',  # 29
         'Wesker: I don\'t think you want to die just yet.',  # 30
         'Wesker: I have something that\'s of some interest to you.',  # 31
-        # Wesker clicks something on the control panel. Fluid in Tyrant's capsule goes down
         '...',  # 32 - Chris moves closer to capsule
         # Wesker puts down the gun and turns to the Tyrant
         'Wesker: The ultimate life-form--',  # 33
@@ -951,6 +966,9 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
     dark_surface.fill((0, 0, 0))
     dark_surface.set_alpha(128)
 
+    sound_gunshot = sound
+    sound_played = False
+
     script_running = True
     while script_running:
         for event in pygame.event.get():
@@ -981,6 +999,9 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock:
                     elif next_line == 11:
                         wesker.change_state('wesker_control_aiming')
                     elif next_line == 26:
+                        if not sound_played:
+                            sound_gunshot.play()
+                            sound_played = True
                         wesker.change_state('wesker_control_firing')
                     elif next_line == 27:
                         rebecca_img = pygame.transform.scale(

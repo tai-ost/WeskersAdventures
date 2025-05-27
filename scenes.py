@@ -113,7 +113,7 @@ class Enemy:
 
         self.__name: str = ENEMY_TYPES[enemy_type][0]
 
-        self.__health: int = ENEMY_TYPES[enemy_type][1] + difficulty * 2
+        self.__health: int = ENEMY_TYPES[enemy_type][1] + difficulty
         self.__dmg: int = ENEMY_TYPES[enemy_type][2] + (difficulty * 5 if self.__name != 'adder' else 0)
         self.__velocity: int = ENEMY_TYPES[enemy_type][3]
         self.__is_poisonous: bool = ENEMY_TYPES[enemy_type][4]

@@ -109,7 +109,7 @@ class HUD:
         if self.__current_slot != 4:
             action = self.__inventory[self.__current_slot].action()
             # First Aid Spray and Mixed Herbs (G + R)
-            if action == 1 or action == 8:
+            if action == 1 or action == 7:
                 self.__health_points = 100
             # Green Herb
             elif action == 2:
@@ -127,7 +127,7 @@ class HUD:
             elif action == 6:
                 self.__ammo_stored += 15
             # Mixed Herbs (G + B)
-            elif action == 7:
+            elif action == 8:
                 self.__poisoned = False
                 self.__health_points = min(100, self.__health_points + 25)
             # Mixed Herbs (G + G)
