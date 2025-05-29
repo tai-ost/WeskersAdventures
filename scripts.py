@@ -1053,7 +1053,7 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface,
 
         pygame.draw.rect(screen, floor_color, floor_rect)
 
-        if (next_line == 0) or (next_line == 1) or (next_line == 3) or(next_line == 42) or (next_line == 43):
+        if (next_line == 0) or (next_line == 1) or (next_line == 3) or (next_line == 42) or (next_line == 43):
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 1280, 720))
         elif next_line == 39:
             screen.blit(dark_surface, impaled_rect)

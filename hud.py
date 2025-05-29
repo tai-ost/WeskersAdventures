@@ -14,7 +14,6 @@ class Item:
         self.__action = action
 
         self.combining = False
-        ...
 
     def get_name(self):
         return self.__name
@@ -44,27 +43,27 @@ class Item:
 
 class HUD:
     def __init__(self, font: pygame.font.Font):
-        self.__hidden = False
+        self.__hidden: bool = False
 
         self.__font: pygame.font.Font = font
 
-        self.__timer = 0
-        self.__timer_color = pygame.Color(250, 250, 250)
+        self.__timer: int = 0
+        self.__timer_color: pygame.Color = pygame.Color(250, 250, 250)
 
-        self.__health_points = 100
-        self.__health_state = 'fine'
+        self.__health_points: int = 100
+        self.__health_state: str = 'fine'
 
-        self.__grace = False
-        self.__grace_period = 0
+        self.__grace: bool = False
+        self.__grace_period: int = 0
 
-        self.__poisoned = False
-        self.__poisoned_last_tick = 0
-        self.__poisoned_current_tick = 0
+        self.__poisoned: bool = False
+        self.__poisoned_last_tick: int = 0
+        self.__poisoned_current_tick: int = 0
 
-        self.__ammo_stored = DEFAULT_AMMO_STORED
-        self.__ammo_loaded = DEFAULT_AMMO_LOADED
+        self.__ammo_stored: int = DEFAULT_AMMO_STORED
+        self.__ammo_loaded: int = DEFAULT_AMMO_LOADED
 
-        self.__inventory_keys = {
+        self.__inventory_keys: dict = {
             pygame.K_1: 0,
             pygame.K_2: 1,
             pygame.K_3: 2,
@@ -76,22 +75,22 @@ class HUD:
             Item(None),
             Item(None)
         ]
-        self.__current_slot = 4
-        self.__slot = 'inventory_slot'
-        self.__combine_item_slots = list()
-        self.__combine_frame_color = pygame.Color(150, 30, 30)
+        self.__current_slot: int = 4
+        self.__slot: str = 'inventory_slot'
+        self.__combine_item_slots: list[int] = list()
+        self.__combine_frame_color: pygame.Color = pygame.Color(150, 30, 30)
 
-        self.__ammo_text_color = pygame.Color(150, 150, 150)
-        self.__health_rect = pygame.Rect(0, 0, 160, 80)
-        self.__ammo_box_rect = pygame.Rect(0, self.__health_rect.height, 160, 40)
+        self.__ammo_text_color: pygame.Color = pygame.Color(150, 150, 150)
+        self.__health_rect: pygame.Rect = pygame.Rect(0, 0, 160, 80)
+        self.__ammo_box_rect: pygame.Rect = pygame.Rect(0, self.__health_rect.height, 160, 40)
 
-        self.__defensive_item_count = 1
-        self.__defensive_item_count_color = pygame.Color(150, 150, 150)
-        self.__defensive_item_box_rect = pygame.Rect(480, 0, 80, 80)
+        self.__defensive_item_count: int = 1
+        self.__defensive_item_count_color: pygame.Color = pygame.Color(150, 150, 150)
+        self.__defensive_item_box_rect: pygame.Rect = pygame.Rect(480, 0, 80, 80)
 
-        self.__item_name_color = pygame.Color(200, 200, 200)
+        self.__item_name_color: pygame.Color = pygame.Color(200, 200, 200)
 
-        self.__lisa = True
+        self.__lisa: bool = True
 
     def hide_or_show(self):
         self.__hidden = not self.__hidden
@@ -213,7 +212,7 @@ class HUD:
                 self.__inventory[self.__combine_item_slots[1]].combining = False
                 self.__combine_item_slots = list()
 
-    def get_damage(self, dmg, is_poisonous):
+    def get_damage(self, dmg: int, is_poisonous: bool):
         if not self.__grace_period:
             if not self.__defensive_item_count:
                 self.__health_points -= dmg
@@ -244,16 +243,16 @@ class HUD:
         if self.__grace_period and (pygame.time.get_ticks() > self.__grace_period):
             self.__grace_period = 0
 
-    def update_time(self, time_passed):
+    def update_time(self, time_passed: int):
         self.__timer = time_passed
 
-    def update_lisa_state(self, state):
+    def update_lisa_state(self, state: bool):
         self.__lisa = state
 
     def check_lisa_state(self):
         return self.__lisa
 
-    def update_ammo(self, ammo):
+    def update_ammo(self, ammo: int):
         self.__ammo_loaded = ammo
 
     def get_ammo_stored(self):
@@ -279,7 +278,7 @@ class HUD:
         )
         return image
 
-    def __show_health(self, screen):
+    def __show_health(self, screen: pygame.Surface):
         screen.blit(self.__load_health_state_image(), self.__health_rect)
 
     def __load_inventory_slot_image(self, slot_number: int):
@@ -308,7 +307,7 @@ class HUD:
             )
         return item_image
 
-    def __show_item_name(self, screen):
+    def __show_item_name(self, screen: pygame.Surface):
         name_surface = self.__font.render(f'{ITEM_TYPES[self.__inventory[self.__current_slot].action()][3]}',
                                           1, self.__item_name_color)
         name_rect = name_surface.get_rect()
@@ -317,7 +316,7 @@ class HUD:
 
         screen.blit(name_surface, name_rect)
 
-    def __show_inventory(self, screen):
+    def __show_inventory(self, screen: pygame.Surface):
         for slot_number in range(4):
             slot_rect = pygame.Rect(self.__health_rect.width + INVENTORY_SLOT_WIDTH * slot_number, 0,
                                     INVENTORY_SLOT_WIDTH, INVENTORY_SLOT_HEIGHT)
@@ -340,7 +339,7 @@ class HUD:
                                    15, 15)
             screen.blit(num_image, num_rect)
 
-    def __show_ammo(self, screen):
+    def __show_ammo(self, screen: pygame.Surface):
         ammo_surface = self.__font.render(f'Ammo: {self.__ammo_loaded}/{self.__ammo_stored}',
                                           1, self.__ammo_text_color)
         ammo_rect = ammo_surface.get_rect()
@@ -354,7 +353,7 @@ class HUD:
         screen.blit(ammo_box_image, self.__ammo_box_rect)
         screen.blit(ammo_surface, ammo_rect)
 
-    def __show_defensive_item(self, screen):
+    def __show_defensive_item(self, screen: pygame.Surface):
         defensive_item_surface = self.__font.render(f'x{self.__defensive_item_count}',
                                                     1, self.__defensive_item_count_color)
         defensive_item_rect = defensive_item_surface.get_rect()
@@ -368,7 +367,7 @@ class HUD:
         screen.blit(defensive_item_box_image, self.__defensive_item_box_rect)
         screen.blit(defensive_item_surface, defensive_item_rect)
 
-    def __show_timer(self, screen):
+    def __show_timer(self, screen: pygame.Surface):
         seconds = self.__timer // 1000
         minutes = seconds // 60
         seconds %= 60
@@ -379,7 +378,7 @@ class HUD:
 
         screen.blit(time_surface, time_rect)
 
-    def draw_hud(self, screen):
+    def draw_hud(self, screen: pygame.Surface):
         if not self.__hidden:
             self.__show_health(screen)
             self.__show_ammo(screen)

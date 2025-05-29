@@ -811,36 +811,37 @@ class Game:
 
 class Menu:
     def __init__(self, font_buttons: pygame.font.Font, font_caption: pygame.font.Font, font_controls: pygame.font.Font):
-        self.__background_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
+        self.__background_rect: pygame.Rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
 
-        self.__start_time_in_menu = 0
+        self.__start_time_in_menu: int = 0
 
-        self.__difficulty: None | int = None
-
-        self.__font_buttons = font_buttons
-        self.__font_caption = font_caption
-        self.__font_controls = font_controls
+        self.__font_buttons: pygame.font.Font = font_buttons
+        self.__font_caption: pygame.font.Font = font_caption
+        self.__font_controls: pygame.font.Font = font_controls
 
         # Caption
-        self.__caption_color = pygame.Color(250, 250, 250)
-        self.__caption_text = self.__font_caption.render('Wesker\'s Adventures', 1, self.__caption_color)
-        self.__caption_rect = self.__caption_text.get_rect()
+        self.__caption_color: pygame.Color = pygame.Color(250, 250, 250)
+        self.__caption_text: pygame.Surface = self.__font_caption.render('Wesker\'s Adventures',
+                                                                         1, self.__caption_color)
+        self.__caption_rect: pygame.Rect = self.__caption_text.get_rect()
         self.__caption_rect.x = WIDTH // 2 - self.__caption_rect.width // 2
         self.__caption_rect.y = HEIGHT // 4
 
         # Buttons
-        self.__button_color_idle = pygame.Color(150, 150, 150)
-        self.__button_color_hover = pygame.Color(230, 230, 230)
+        self.__button_color_idle: pygame.Color = pygame.Color(150, 150, 150)
+        self.__button_color_hover: pygame.Color = pygame.Color(230, 230, 230)
 
-        self.__play_button_state = False
-        self.__play_button_surface = self.__font_buttons.render('Play', 1, self.__button_color_idle)
-        self.__play_button_rect = self.__play_button_surface.get_rect()
+        self.__play_button_state: bool = False
+        self.__play_button_surface: pygame.Surface = self.__font_buttons.render('Play',
+                                                                                1, self.__button_color_idle)
+        self.__play_button_rect: pygame.Rect = self.__play_button_surface.get_rect()
         self.__play_button_rect.x = WIDTH // 2 - self.__play_button_rect.width // 2
         self.__play_button_rect.y = HEIGHT // 2 - self.__play_button_rect.height // 2
 
-        self.__exit_button_state = False
-        self.__exit_button_surface = self.__font_buttons.render('Exit', 1, self.__button_color_idle)
-        self.__exit_button_rect = self.__exit_button_surface.get_rect()
+        self.__exit_button_state: bool = False
+        self.__exit_button_surface: pygame.Surface = self.__font_buttons.render('Exit',
+                                                                                1, self.__button_color_idle)
+        self.__exit_button_rect: pygame.Rect = self.__exit_button_surface.get_rect()
         self.__exit_button_rect.x = WIDTH // 2 - self.__exit_button_rect.width // 2
         self.__exit_button_rect.y = self.__play_button_rect.y + 50
 
@@ -848,126 +849,142 @@ class Menu:
         self.__volume: float = 0.5
         pygame.mixer.music.set_volume(self.__volume)
 
-        self.__slider_rect = pygame.Rect(150, HEIGHT // 2,
-                                         200, 20)
+        self.__slider_rect: pygame.Rect = pygame.Rect(150, HEIGHT // 2, 200, 20)
         self.__slider_color = pygame.Color(80, 80, 80)
-        self.__pointer_rect = pygame.Rect(int(self.__volume * 100 * 2) + self.__slider_rect.x - 5, HEIGHT // 2 - 5,
-                                          10, 30)
+        self.__pointer_rect: pygame.Rect = pygame.Rect(int(self.__volume * 100 * 2) + self.__slider_rect.x - 5,
+                                                       HEIGHT // 2 - 5, 10, 30)
         self.__pointer_color = pygame.Color(120, 120, 120)
         self.__pointer_state = False
 
-        self.__volume_text_surface = self.__font_controls.render(f'Volume: {int(self.__volume * 100)}%', 1,
-                                                                 self.__button_color_idle)
-        self.__volume_text_rect = self.__volume_text_surface.get_rect()
+        self.__volume_text_surface: pygame.Surface = self.__font_controls.render(
+            f'Volume: {int(self.__volume * 100)}%', 1, self.__button_color_idle)
+        self.__volume_text_rect: pygame.Rect = self.__volume_text_surface.get_rect()
         self.__volume_text_rect.x = (self.__slider_rect.x + self.__slider_rect.width // 2 -
                                      self.__volume_text_rect.width // 2)
         self.__volume_text_rect.y = self.__slider_rect.y + self.__slider_rect.height + 15
 
         # Difficulty
-        self.__dif_surface = self.__font_controls.render('Difficulty:', 1, self.__button_color_idle)
-        self.__dif_rect = self.__dif_surface.get_rect()
+        self.__difficulty: None | int = None
+
+        self.__dif_surface: pygame.Surface = self.__font_controls.render('Difficulty:',
+                                                                         1, self.__button_color_idle)
+        self.__dif_rect: pygame.Rect = self.__dif_surface.get_rect()
         self.__dif_rect.x = WIDTH - 350
         self.__dif_rect.y = HEIGHT // 2 - 40
 
         self.__hard_button_state = False
-        self.__hard_button_surface = self.__font_controls.render('Hard', 1, self.__button_color_idle)
-        self.__hard_button_rect = self.__hard_button_surface.get_rect()
+        self.__hard_button_surface: pygame.Surface = self.__font_controls.render('Hard',
+                                                                                 1, self.__button_color_idle)
+        self.__hard_button_rect: pygame.Rect = self.__hard_button_surface.get_rect()
         self.__hard_button_rect.x = self.__dif_rect.x
         self.__hard_button_rect.y = self.__dif_rect.y + 30
 
         self.__normal_button_state = False
-        self.__normal_button_surface = self.__font_controls.render('Normal', 1, self.__button_color_idle)
-        self.__normal_button_rect = self.__normal_button_surface.get_rect()
+        self.__normal_button_surface: pygame.Surface = self.__font_controls.render('Normal',
+                                                                                   1, self.__button_color_idle)
+        self.__normal_button_rect: pygame.Rect = self.__normal_button_surface.get_rect()
         self.__normal_button_rect.x = self.__dif_rect.x
         self.__normal_button_rect.y = self.__hard_button_rect.y + 30
 
         self.__easy_button_state = False
-        self.__easy_button_surface = self.__font_controls.render('Easy', 1, self.__button_color_idle)
-        self.__easy_button_rect = self.__easy_button_surface.get_rect()
+        self.__easy_button_surface: pygame.Surface = self.__font_controls.render('Easy',
+                                                                                 1, self.__button_color_idle)
+        self.__easy_button_rect: pygame.Rect = self.__easy_button_surface.get_rect()
         self.__easy_button_rect.x = self.__dif_rect.x
         self.__easy_button_rect.y = self.__normal_button_rect.y + 30
 
-        self.__dif_set_surface = self.__font_controls.render('Normal', 1, self.__button_color_idle)
+        self.__dif_set_surface: pygame.Surface = self.__font_controls.render('Normal',
+                                                                             1, self.__button_color_idle)
         self.__dif_set_rect: pygame.Rect = pygame.Rect(1, 1, 1, 1)
 
         # Controls
-        self.__wasd_image = pygame.transform.scale(
+        self.__wasd_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/wasd.png').convert_alpha(),
             (140, 90),
         )
-        self.__wasd_rect = pygame.Rect(WIDTH // 4 - 70, HEIGHT - 200, 140, 90)
-        self.__wasd_text_surface = self.__font_controls.render('Movement', 1, self.__button_color_idle)
-        self.__wasd_text_rect = self.__wasd_text_surface.get_rect()
+        self.__wasd_rect: pygame.Rect = pygame.Rect(WIDTH // 4 - 70, HEIGHT - 200, 140, 90)
+        self.__wasd_text_surface: pygame.Surface = self.__font_controls.render('Movement',
+                                                                               1, self.__button_color_idle)
+        self.__wasd_text_rect: pygame.Rect = self.__wasd_text_surface.get_rect()
         self.__wasd_text_rect.x = self.__wasd_rect.x + self.__wasd_rect.width // 2 - self.__wasd_text_rect.width // 2
         self.__wasd_text_rect.y = self.__wasd_rect.y + self.__wasd_rect.height + 10
 
-        self.__c_image = pygame.transform.scale(
+        self.__c_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/c.png').convert_alpha(),
             (40, 40),
         )
-        self.__c_rect = pygame.Rect(WIDTH // 2 - 20, HEIGHT - 200, 40, 40)
-        self.__c_text_surface = self.__font_controls.render('Combine herbs', 1, self.__button_color_idle)
-        self.__c_text_rect = self.__c_text_surface.get_rect()
+        self.__c_rect: pygame.Rect = pygame.Rect(WIDTH // 2 - 20, HEIGHT - 200, 40, 40)
+        self.__c_text_surface: pygame.Surface = self.__font_controls.render('Combine herbs',
+                                                                            1, self.__button_color_idle)
+        self.__c_text_rect: pygame.Rect = self.__c_text_surface.get_rect()
         self.__c_text_rect.x = self.__c_rect.x + self.__c_rect.width // 2 - self.__c_text_rect.width // 2
         self.__c_text_rect.y = self.__c_rect.y + self.__c_rect.height + 10
 
-        self.__u_image = pygame.transform.scale(
+        self.__u_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/u.png').convert_alpha(),
             (40, 40),
         )
-        self.__u_rect = pygame.Rect(WIDTH // 2 - 100, self.__c_text_rect.y + 30, 40, 40)
-        self.__u_text_surface = self.__font_controls.render('Use the item', 1, self.__button_color_idle)
-        self.__u_text_rect = self.__u_text_surface.get_rect()
+        self.__u_rect: pygame.Rect = pygame.Rect(WIDTH // 2 - 100, self.__c_text_rect.y + 30, 40, 40)
+        self.__u_text_surface: pygame.Surface = self.__font_controls.render('Use the item',
+                                                                            1, self.__button_color_idle)
+        self.__u_text_rect: pygame.Rect = self.__u_text_surface.get_rect()
         self.__u_text_rect.x = self.__u_rect.x + self.__u_rect.width // 2 - self.__u_text_rect.width // 2
         self.__u_text_rect.y = self.__u_rect.y + self.__u_rect.height + 10
 
-        self.__h_image = pygame.transform.scale(
+        self.__h_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/h.png').convert_alpha(),
             (40, 40),
         )
-        self.__h_rect = pygame.Rect(WIDTH // 2 + 60, self.__c_text_rect.y + 30, 40, 40)
-        self.__h_text_surface = self.__font_controls.render('Hide\\show HUD', 1, self.__button_color_idle)
-        self.__h_text_rect = self.__h_text_surface.get_rect()
+        self.__h_rect: pygame.Rect = pygame.Rect(WIDTH // 2 + 60, self.__c_text_rect.y + 30, 40, 40)
+        self.__h_text_surface: pygame.Surface = self.__font_controls.render('Hide\\show HUD',
+                                                                            1, self.__button_color_idle)
+        self.__h_text_rect: pygame.Rect = self.__h_text_surface.get_rect()
         self.__h_text_rect.x = self.__h_rect.x + self.__h_rect.width // 2 - self.__h_text_rect.width // 2
         self.__h_text_rect.y = self.__h_rect.y + self.__h_rect.height + 10
 
-        self.__rmb_image = pygame.transform.scale(
+        self.__rmb_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/rmb.png').convert_alpha(),
             (60, 80),
         )
-        self.__rmb_rect = pygame.Rect(WIDTH - WIDTH // 4 - 100, HEIGHT - 200, 60, 80)
-        self.__rmb_text_surface = self.__font_controls.render('Aim', 1, self.__button_color_idle)
-        self.__rmb_text_rect = self.__rmb_text_surface.get_rect()
+        self.__rmb_rect: pygame.Rect = pygame.Rect(WIDTH - WIDTH // 4 - 100, HEIGHT - 200, 60, 80)
+        self.__rmb_text_surface: pygame.Surface = self.__font_controls.render('Aim',
+                                                                              1, self.__button_color_idle)
+        self.__rmb_text_rect: pygame.Rect = self.__rmb_text_surface.get_rect()
         self.__rmb_text_rect.x = self.__rmb_rect.x + self.__rmb_rect.width // 2 - self.__rmb_text_rect.width // 2
         self.__rmb_text_rect.y = self.__rmb_rect.y + self.__rmb_rect.height + 10
 
-        self.__lmb_image = pygame.transform.scale(
+        self.__lmb_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/lmb.png').convert_alpha(),
             (60, 80),
         )
-        self.__lmb_rect = pygame.Rect(self.__rmb_rect.x + self.__rmb_rect.width + 20, self.__rmb_rect.y, 60, 80)
-        self.__lmb_text_surface = self.__font_controls.render('Fire', 1, self.__button_color_idle)
-        self.__lmb_text_rect = self.__lmb_text_surface.get_rect()
+        self.__lmb_rect: pygame.Rect = pygame.Rect(self.__rmb_rect.x + self.__rmb_rect.width + 20, self.__rmb_rect.y,
+                                                   60, 80)
+        self.__lmb_text_surface: pygame.Surface = self.__font_controls.render('Fire',
+                                                                              1, self.__button_color_idle)
+        self.__lmb_text_rect: pygame.Rect = self.__lmb_text_surface.get_rect()
         self.__lmb_text_rect.x = self.__lmb_rect.x + self.__lmb_rect.width // 2 - self.__lmb_text_rect.width // 2
         self.__lmb_text_rect.y = self.__lmb_rect.y + self.__lmb_rect.height + 10
 
-        self.__r_image = pygame.transform.scale(
+        self.__r_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/r.png').convert_alpha(),
             (40, 40),
         )
-        self.__r_rect = pygame.Rect(self.__lmb_rect.x + self.__lmb_rect.width + 40, self.__rmb_rect.y + 20, 40, 40)
-        self.__r_text_surface = self.__font_controls.render('Reload', 1, self.__button_color_idle)
-        self.__r_text_rect = self.__r_text_surface.get_rect()
+        self.__r_rect: pygame.Rect = pygame.Rect(self.__lmb_rect.x + self.__lmb_rect.width + 40, self.__rmb_rect.y + 20,
+                                                 40, 40)
+        self.__r_text_surface: pygame.Surface = self.__font_controls.render('Reload',
+                                                                            1, self.__button_color_idle)
+        self.__r_text_rect: pygame.Rect = self.__r_text_surface.get_rect()
         self.__r_text_rect.x = self.__r_rect.x + self.__r_rect.width // 2 - self.__r_text_rect.width // 2
         self.__r_text_rect.y = self.__r_rect.y + self.__r_rect.height + 10
 
-        self.__esc_image = pygame.transform.scale(
+        self.__esc_image: pygame.Surface = pygame.transform.scale(
             pygame.image.load(f'images/hud_img/other/esc.png').convert_alpha(),
             (50, 40),
         )
-        self.__esc_rect = pygame.Rect(WIDTH - 300, 20, 50, 40)
-        self.__esc_text_surface = self.__font_controls.render('Return to menu (Pause)', 1, self.__button_color_idle)
-        self.__esc_text_rect = self.__esc_text_surface.get_rect()
+        self.__esc_rect: pygame.Rect = pygame.Rect(WIDTH - 300, 20, 50, 40)
+        self.__esc_text_surface: pygame.Surface = self.__font_controls.render('Return to menu (Pause)',
+                                                                              1, self.__button_color_idle)
+        self.__esc_text_rect: pygame.Rect = self.__esc_text_surface.get_rect()
         self.__esc_text_rect.x = self.__esc_rect.x + self.__esc_rect.width + 10
         self.__esc_text_rect.y = self.__esc_rect.y + self.__esc_rect.height // 2 - self.__esc_text_rect.height // 2 + 2
 

@@ -79,11 +79,11 @@ class Scene:
         self.__draw_background(screen)
         self.__draw_entities(screen, wesker)
 
-    def draw_overlay(self, screen):
+    def draw_overlay(self, screen: pygame.Surface):
         if self.__overlay:
             screen.blit(self.__overlay_image, self.__background_rect)
 
-    def draw_for_script(self, screen):
+    def draw_for_script(self, screen: pygame.Surface):
         self.__draw_background(screen)
 
     def change_background_image(self, background_image: str):
@@ -98,10 +98,10 @@ class Scene:
                 (WIDTH, ACTUAL_HEIGHT),
             )
 
-    def __draw_background(self, screen):
+    def __draw_background(self, screen: pygame.Surface):
         screen.blit(self.__background_image, self.__background_rect)
 
-    def __draw_entities(self, screen, wesker: Wesker):
+    def __draw_entities(self, screen: pygame.Surface, wesker: Wesker):
         entity: Door | Enemy | EnvironmentItem
         for entity in self.__entities:
             entity.draw_entity(screen, wesker)
@@ -189,14 +189,14 @@ class Enemy:
             )
         return image
 
-    def draw_entity(self, screen, _):
+    def draw_entity(self, screen: pygame.Surface, _):
         screen.blit(self.__load_image(), self.__rect)
 
 
 class EnvironmentItem:
-    def __init__(self, x, y, item_type, font: pygame.font.Font):
+    def __init__(self, x: int, y: int, item_type: int, font: pygame.font.Font):
         self.entity_type: str = 'item'
-        self.__item_type = item_type
+        self.__item_type: int = item_type
         self.__item_name: str = ITEM_TYPES[item_type][0]
 
         self.__width: int = ITEM_TYPES[item_type][1]
@@ -210,8 +210,8 @@ class EnvironmentItem:
         self.__rect: pygame.Rect = pygame.Rect(self.__x, self.__y, self.__width, self.__height)
 
         self.__font: pygame.font.Font = font
-        self.__taken = False
-        self.__action = False
+        self.__taken: bool = False
+        self.__action: bool = False
 
     def check_entity_logic(self, wesker: Wesker, _):
         self.__check_item_collision(wesker)
@@ -232,7 +232,7 @@ class EnvironmentItem:
     def get_item_type(self):
         return self.__item_type
 
-    def __show_prompt(self, screen, wesker: Wesker):
+    def __show_prompt(self, screen: pygame.Surface, wesker: Wesker):
         button_x, button_y = wesker.get_hitbox_rect().x, wesker.get_hitbox_rect().y
         button_rect = pygame.Rect(button_x - 50, button_y - 50, 50, 50)
         button_image = pygame.transform.scale(
@@ -255,7 +255,7 @@ class EnvironmentItem:
         )
         return image
 
-    def draw_entity(self, screen, wesker: Wesker):
+    def draw_entity(self, screen: pygame.Surface, wesker: Wesker):
         if not self.__taken:
             screen.blit(self.__load_image(), self.__rect)
             if self.__action:
@@ -266,26 +266,26 @@ class Door:
     def __init__(self, x: int, image_source: str, image_width: int, image_height: int,
                  scene_id: int, go_to_scene_id: int, go_to_scene_name: str, go_to_x_coords: int,
                  font: pygame.font.Font):
-        self.entity_type = 'door'
+        self.entity_type: str = 'door'
 
-        self.__image_source = image_source
-        self.__image_width = image_width
-        self.__image_height = image_height
+        self.__image_source: str = image_source
+        self.__image_width: int = image_width
+        self.__image_height: int = image_height
 
-        self.__scene_id = scene_id
-        self.go_to_scene_id = go_to_scene_id
-        self.__go_to_scene_name = go_to_scene_name
-        self.go_to_x_coords = go_to_x_coords
+        self.__scene_id: int = scene_id
+        self.go_to_scene_id: int = go_to_scene_id
+        self.__go_to_scene_name: str = go_to_scene_name
+        self.go_to_x_coords: int = go_to_x_coords
 
-        self.__prompt_color = pygame.Color(250, 250, 250)
-        self.__prompt_text = f'Go to {self.__go_to_scene_name}'
+        self.__prompt_color: pygame.Color = pygame.Color(250, 250, 250)
+        self.__prompt_text: str = f'Go to {self.__go_to_scene_name}'
 
-        self.__x = x
-        self.__y = ACTUAL_HEIGHT - self.__image_height
-        self.__rect = pygame.Rect(self.__x, self.__y, self.__image_width, self.__image_height)
+        self.__x: int = x
+        self.__y: int = ACTUAL_HEIGHT - self.__image_height
+        self.__rect: pygame.Rect = pygame.Rect(self.__x, self.__y, self.__image_width, self.__image_height)
 
-        self.__font = font
-        self.__action = False
+        self.__font: pygame.font.Font = font
+        self.__action: bool = False
 
     def check_entity_logic(self, wesker: Wesker, _):
         self.__check_door_collision(wesker)
@@ -299,7 +299,7 @@ class Door:
     def scene_change_allowed(self):
         return self.__action
 
-    def __show_prompt(self, screen):
+    def __show_prompt(self, screen: pygame.Surface):
         prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
         prompt_rect: pygame.Rect = prompt_surface.get_rect()
         prompt_rect.x = WIDTH // 2 - prompt_rect.width // 2
@@ -321,7 +321,7 @@ class Door:
         )
         return image
 
-    def draw_entity(self, screen, _):
+    def draw_entity(self, screen: pygame.Surface, _):
         screen.blit(self.__load_image(), self.__rect)
         if self.__action:
             self.__show_prompt(screen)
@@ -329,18 +329,18 @@ class Door:
 
 class ItemBox:
     def __init__(self, font: pygame.font.Font):
-        self.entity_type = 'item_box'
+        self.entity_type: str = 'item_box'
 
-        self.__prompt_color = pygame.Color(250, 250, 250)
-        self.__prompt_text = f'Open the Item Box'
-        self.__opened = False
+        self.__prompt_color: pygame.Color = pygame.Color(250, 250, 250)
+        self.__prompt_text: str = f'Open the Item Box'
+        self.__opened: bool = False
 
-        self.__box_size = 180
+        self.__box_size: int = 180
 
-        self.__rect = pygame.Rect(620, ACTUAL_HEIGHT - self.__box_size, self.__box_size, self.__box_size)
+        self.__rect: pygame.Rect = pygame.Rect(620, ACTUAL_HEIGHT - self.__box_size, self.__box_size, self.__box_size)
 
-        self.__font = font
-        self.__action = False
+        self.__font: pygame.font.Font = font
+        self.__action: bool = False
 
     def box_active(self):
         return self.__action
@@ -359,7 +359,7 @@ class ItemBox:
             else:
                 self.__action = False
 
-    def __show_prompt(self, screen):
+    def __show_prompt(self, screen: pygame.Surface):
         prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
         prompt_rect: pygame.Rect = prompt_surface.get_rect()
         prompt_rect.x = WIDTH // 2 - prompt_rect.width // 2
@@ -374,27 +374,27 @@ class ItemBox:
         screen.blit(button_image, button_rect)
         screen.blit(prompt_surface, prompt_rect)
 
-    def draw_entity(self, screen, _):
+    def draw_entity(self, screen: pygame.Surface, _):
         if self.__action and not self.__opened:
             self.__show_prompt(screen)
 
 
 class Kitty:
     def __init__(self, font: pygame.font.Font):
-        self.entity_type = 'kitty'
+        self.entity_type: str = 'kitty'
 
-        self.__image_source = 'kitty'
-        self.__image_width = 150
-        self.__image_height = 150
+        self.__image_source: str = 'kitty'
+        self.__image_width: int = 150
+        self.__image_height: int = 150
 
-        self.__prompt_color = pygame.Color(30, 90, 220)
-        self.__prompt_text = f'Accept Kitty\'s power!'
-        self.__state = False
+        self.__prompt_color: pygame.Color = pygame.Color(30, 90, 220)
+        self.__prompt_text: str = f'Accept Kitty\'s power!'
+        self.__state: bool = False
 
-        self.__rect = pygame.Rect(630, 350, self.__image_width, self.__image_height)
+        self.__rect: pygame.Rect = pygame.Rect(630, 350, self.__image_width, self.__image_height)
 
-        self.__font = font
-        self.__action = False
+        self.__font: pygame.font.Font = font
+        self.__action: bool = False
 
     def kitty_power(self):
         return self.__action
@@ -425,7 +425,7 @@ class Kitty:
         else:
             self.__rect.y = 350
 
-    def __show_prompt(self, screen):
+    def __show_prompt(self, screen: pygame.Surface):
         prompt_surface = self.__font.render(self.__prompt_text, 1, self.__prompt_color)
         prompt_rect: pygame.Rect = prompt_surface.get_rect()
         prompt_rect.x = WIDTH // 2 - prompt_rect.width // 2
@@ -447,7 +447,7 @@ class Kitty:
         )
         return image
 
-    def draw_entity(self, screen, _):
+    def draw_entity(self, screen: pygame.Surface, _):
         screen.blit(self.__load_image(), self.__rect)
         if self.__action:
             self.__show_prompt(screen)
