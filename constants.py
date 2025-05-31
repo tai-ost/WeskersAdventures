@@ -11,7 +11,7 @@ DEFAULT_AMMO_STORED = 15
 
 # (name, health, dmg, velocity, is_poisonous, width, height)
 ENEMY_TYPES = (
-    ('zombie', 5, 25, 2, False, 100, 200),             # 0
+    ('zombie', 5, 25, 2, False, 125, 250),             # 0
     ('cerberus', 3, 20, 5, False, 200, 100),           # 1
     ('adder', 1, 1, 5, True, 100, 20),                 # 2
     ('hunter', 6, 35, 2, False, 250, 250),             # 3

@@ -143,6 +143,7 @@ class Enemy:
 
     def __get_damage(self):
         self.__health -= 1
+        self.__last_frame = 2
         if not self.__health > 0:
             self.__alive = False
             self.__rect = pygame.Rect(self.__rect.x, ACTUAL_HEIGHT - 100, 250, 100)
@@ -157,9 +158,8 @@ class Enemy:
     def __check_enemy_movement(self, wesker: Wesker):
         if self.__alive:
             self.__direction = wesker.get_hitbox_rect().x < self.__rect.x
-            self.__last_frame_count += 1
-            if self.__last_frame_count > (FPS // 2):
-                self.__last_frame_count = 0
+            if (pygame.time.get_ticks() - self.__last_frame_count) > 450:
+                self.__last_frame_count = pygame.time.get_ticks()
                 self.__last_frame = not self.__last_frame
             self.__rect.x += self.__velocity * ((-1) ** self.__direction)
 

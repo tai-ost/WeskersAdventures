@@ -108,24 +108,18 @@ class Game:
                 self.__menu.change_volume_pointer_state(True)
                 if self.__menu.check_play_button_pressed():
                     if self.__difficulty is None:
-                        self.__difficulty = 1
+                        self.__difficulty = self.__menu.get_preset_difficulty()
                         self.__menu.set_difficulty(self.__difficulty)
                         self.__prepare_scenes()
                     self.__in_menu = False
                     self.__in_menu_time = pygame.time.get_ticks() - self.__menu.get_start_time_in_menu()
                 if self.__difficulty is None:
                     if self.__menu.check_dif_hard_button_pressed():
-                        self.__difficulty = 2
-                        self.__menu.set_difficulty(self.__difficulty)
-                        self.__prepare_scenes()
+                        self.__menu.set_difficulty_circle(2)
                     if self.__menu.check_dif_normal_button_pressed():
-                        self.__difficulty = 1
-                        self.__menu.set_difficulty(self.__difficulty)
-                        self.__prepare_scenes()
+                        self.__menu.set_difficulty_circle(1)
                     if self.__menu.check_dif_easy_button_pressed():
-                        self.__difficulty = 0
-                        self.__menu.set_difficulty(self.__difficulty)
-                        self.__prepare_scenes()
+                        self.__menu.set_difficulty_circle(0)
             elif (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1):
                 self.__menu.change_volume_pointer_state(False)
 
@@ -893,6 +887,10 @@ class Menu:
         self.__easy_button_rect.x = self.__dif_rect.x
         self.__easy_button_rect.y = self.__normal_button_rect.y + 30
 
+        self.__preset_difficulty = 1
+        self.__difficulty_circle_y = self.__normal_button_rect.y + 10
+        self.__difficulty_circle_x = self.__normal_button_rect.x - 15
+
         self.__dif_set_surface: pygame.Surface = self.__font_controls.render('Normal',
                                                                              1, self.__button_color_idle)
         self.__dif_set_rect: pygame.Rect = pygame.Rect(1, 1, 1, 1)
@@ -1060,6 +1058,18 @@ class Menu:
     def check_dif_easy_button_pressed(self):
         return self.__easy_button_state
 
+    def get_preset_difficulty(self):
+        return self.__preset_difficulty
+
+    def set_difficulty_circle(self, difficulty: int):
+        self.__preset_difficulty = difficulty
+        if difficulty == 0:
+            self.__difficulty_circle_y = self.__easy_button_rect.y + 10
+        elif difficulty == 1:
+            self.__difficulty_circle_y = self.__normal_button_rect.y + 10
+        elif difficulty == 2:
+            self.__difficulty_circle_y = self.__hard_button_rect.y + 10
+
     def set_difficulty(self, difficulty: int):
         self.__difficulty = difficulty
 
@@ -1123,6 +1133,8 @@ class Menu:
             screen.blit(self.__hard_button_surface, self.__hard_button_rect)
             screen.blit(self.__normal_button_surface, self.__normal_button_rect)
             screen.blit(self.__easy_button_surface, self.__easy_button_rect)
+            pygame.draw.circle(screen, self.__pointer_color,
+                               (self.__difficulty_circle_x, self.__difficulty_circle_y), 5)
         else:
             screen.blit(self.__dif_set_surface, self.__dif_set_rect)
 

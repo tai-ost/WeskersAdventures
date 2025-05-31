@@ -52,10 +52,10 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface,
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-            pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-            (50, 40),
+            pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+            (104, 40),
         )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -83,7 +83,8 @@ def script_main_hall(scene: Scene, wesker: Wesker, screen: pygame.Surface,
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -177,10 +178,10 @@ def script_east_wing_stairway(scene: Scene, wesker: Wesker, screen: pygame.Surfa
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -193,7 +194,8 @@ def script_east_wing_stairway(scene: Scene, wesker: Wesker, screen: pygame.Surfa
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -242,10 +244,10 @@ def script_dark_corridor(scene: Scene, wesker: Wesker, screen: pygame.Surface, c
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -257,7 +259,8 @@ def script_dark_corridor(scene: Scene, wesker: Wesker, screen: pygame.Surface, c
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -304,10 +307,10 @@ def script_garden_shed(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -319,7 +322,8 @@ def script_garden_shed(scene: Scene, wesker: Wesker, screen: pygame.Surface, clo
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -378,10 +382,10 @@ def script_gh_corr(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: 
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -400,7 +404,8 @@ def script_gh_corr(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -464,10 +469,10 @@ def script_gh_gallery(scene: Scene, wesker: Wesker, screen: pygame.Surface, cloc
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -479,7 +484,8 @@ def script_gh_gallery(scene: Scene, wesker: Wesker, screen: pygame.Surface, cloc
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -525,10 +531,10 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -547,7 +553,8 @@ def script_generator_room(scene: Scene, wesker: Wesker, screen: pygame.Surface, 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -626,10 +633,10 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface,
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -650,7 +657,8 @@ def script_enrico_room(scene: Scene, wesker: Wesker, screen: pygame.Surface,
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -726,10 +734,10 @@ def script_altar(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: py
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -754,7 +762,8 @@ def script_altar(scene: Scene, wesker: Wesker, screen: pygame.Surface, clock: py
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -813,10 +822,10 @@ def script_altar_after_fight(scene: Scene, wesker: Wesker, screen: pygame.Surfac
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -834,7 +843,8 @@ def script_altar_after_fight(scene: Scene, wesker: Wesker, screen: pygame.Surfac
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -927,10 +937,10 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface,
     floor_rect = pygame.Rect(0, ACTUAL_HEIGHT, WIDTH, FLOOR_HEIGHT)
 
     enter_img = pygame.transform.scale(
-        pygame.image.load(f'images/hud_img/other/enter.png').convert_alpha(),
-        (50, 40),
+        pygame.image.load(f'images/hud_img/other/rmb_or_enter.png').convert_alpha(),
+        (104, 40),
     )
-    enter_rect = pygame.Rect(WIDTH - 60, ACTUAL_HEIGHT + 15, 50, 40)
+    enter_rect = pygame.Rect(WIDTH - 114, ACTUAL_HEIGHT + 15, 104, 40)
 
     wesker.change_x_velocity(0)
     wesker.change_y_velocity(0)
@@ -974,7 +984,8 @@ def script_main_lab(scene: Scene, wesker: Wesker, screen: pygame.Surface,
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 if next_line < len(lines) - 1:
                     next_line += 1
                     line_surface = font.render(lines[next_line], 1, line_color)
@@ -1096,7 +1107,8 @@ def script_end_screen(screen: pygame.Surface, final_time: int, seven_minutes: bo
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 0
-            elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN):
+            elif ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_RETURN)) or \
+                    ((event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 3)):
                 return 0
 
         screen.blit(end_screen_img, end_screen_rect)
